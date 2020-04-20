@@ -6,19 +6,21 @@ import { AppComponent } from './app.component';
 
 import { ChartsModule } from 'ng2-charts';
 import { PieChartComponent } from './pie-chart/pie-chart.component';
-
+import { DataService } from './data.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PieChartComponent,
-    ChartsModule
+    PieChartComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    ChartsModule
   ],
-  providers: [],
+  providers: [
+    DataService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

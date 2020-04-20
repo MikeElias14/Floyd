@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { DataService } from './data.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,15 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'floyd';
+  holdings;
+  holdingTickers;
+  holdingValues;
+
+  constructor(service: DataService) {
+    this.holdings = service.getHoldings();
+
+    this.holdingTickers = Object.keys(this.holdings);
+    this.holdingValues = Object.values(this.holdings);
+   }
+
 }
