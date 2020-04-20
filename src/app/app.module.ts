@@ -4,19 +4,19 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-import { ChartModule } from 'angular-highcharts';
-import { PieComponent } from './pie/pie.component';
+import { ChartsModule } from 'ng2-charts';
+import { PieChartComponent } from './pie-chart/pie-chart.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    PieComponent
+    PieChartComponent,
+    ChartsModule
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
-    ChartModule
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
