@@ -1,6 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { ChartType, ChartOptions } from 'chart.js';
-import { SingleDataSet, Label } from 'ng2-charts';
 
 @Component({
   selector: 'app-pie-chart',
