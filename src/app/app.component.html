@@ -1,0 +1,13 @@
+<div class="container">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/pie-chart">Pie Chart</a>
+    </li>
+  </ul>
+  <div>
+    <app-pie-chart
+      [labels]="holdingTickers"
+      [data]="holdingValues">
+    </app-pie-chart>
+  </div>
+</div>
