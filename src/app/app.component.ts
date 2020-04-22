@@ -9,14 +9,19 @@ import { DataService } from './data.service';
 export class AppComponent {
   title = 'floyd';
   holdings;
-  holdingTickers;
-  holdingValues;
+  tickerData;
+  myTickers;
+  tickerUnits;
+  myTickerValue;
 
   constructor(service: DataService) {
     this.holdings = service.getHoldings();
+    this.myTickers = Object.keys(this.holdings);
+    this.tickerUnits = Object.values(this.holdings);
 
-    this.holdingTickers = Object.keys(this.holdings);
-    this.holdingValues = Object.values(this.holdings);
-   }
+    this.myTickers = this.myTickers.slice(0, 4);
 
+    this.tickerData = service.getTickerData(this.myTickers);
+    console.log(this.tickerData);
+  }
 }
