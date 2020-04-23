@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { IHolding, ITickerData } from './app-holdings.model';
+import { IHolding } from './app-holdings.model';
 
 export class Holding implements IHolding {
     ticker: string;

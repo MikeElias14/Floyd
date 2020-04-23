@@ -11,17 +11,7 @@
     </app-pie-chart>
   </div> -->
 
-  <p>My Tickers:</p>
-  <ul>
-    <li>
-      {{myTickers}}
-    </li>
-  </ul>
-  <ul>
-    <li >
-      {{myTickerValues}}
-    </li>
-  </ul>
+
 
   <p>My Tickers: {{ dateString }}</p>
   <ul>
@@ -34,6 +24,13 @@
   <p>Ticker Value:</p>
     <li *ngFor="let holding of holdings">
       {{holding.ammount * holding.data$['Time Series (Daily)'][dateString]['4. close'] | number }}
+    </li>
+  </ul>
+
+    <p>My Tickers:</p>
+  <ul>
+    <li>
+      {{holdings}}
     </li>
   </ul>
 

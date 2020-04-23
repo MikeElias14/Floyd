@@ -1,17 +1,15 @@
 import { Injectable } from '@angular/core';
 import { AppConfig } from './app.config';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError, concat } from 'rxjs';
-import { catchError, retry, map, tap } from 'rxjs/operators';
+import { Observable} from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { Holding } from './models/app.holdings';
 
-
-
-// TODO: Error handling
 @Injectable()
 export class DataService {
-    protected marketKey = AppConfig.settings.alpha_api_key;
+    protected marketKeys = AppConfig.settings.alpha_api_keys;
     protected marketUrl = AppConfig.settings.alpha_url;
+    protected keyIndex = 0;
 
     constructor(private httpClient: HttpClient) {}
 
@@ -22,53 +20,52 @@ export class DataService {
         };
       }
 
+    // Multiple keys to get around API constraints of 5 calls/min ;)
+    // Update: THey seem to be smart too :(
+    private incrementKey() {
+        if (this.keyIndex < (this.marketKeys.length - 1)) {
+            this.keyIndex++;
+        }
+        else {
+            this.keyIndex = 0;
+        }
+    }
+
     getHoldings(): Array<Holding> {
 
         let res: Array<Holding> = [
             new Holding('ABX.TO', 17, 'gold'),
-            new Holding('AC.TO', 10, 'other')
+            new Holding('AC.TO', 10, 'other'),
+            new Holding('CDZ.TO', 25, 'div'),
+            new Holding('CGR.TO', 8, 'reit'),
+            new Holding('CWW.TO', 5, 'other'),
+            // new Holding('VDY.TO', 25, 'div'),
+            // new Holding('XUU.TO', 4, 'market')
         ];
+        // 'HR.UN': {
+        //     ammount: 5,
+        //     char: 'reit'
+        // },
+        // 'REI.UN': {
+        //     ammount: 3,
+        //     char: 'reit'
+        // }
 
-        res.forEach(holding => {
-            this.getTickerData(holding.ticker).subscribe(tickerData => {
-                console.log(tickerData);
-                holding.data$ = tickerData;
-            });
-        });
-            // 'CDZ.TO': {
-            //     ammount: 25,
-            //     char: 'div'
-            // },
-            // 'CGR.TO': {
-            //     ammount: 8,
-            //     char: 'reit'
-            // },
-            // 'CWW.TO': {
-            //     ammount: 5,
-            //     char: 'other'
-            // },
-            // 'HR.UN': {
-            //     ammount: 5,
-            //     char: 'reit'
-            // },
-            // 'REI.UN': {
-            //     ammount: 3,
-            //     char: 'reit'
-            // },
-            // 'VDY.TO': {
-            //     ammount: 25,
-            //     char: 'div'
-            // },
-            // 'XUU.TO': {
-            //     ammount: 4,
-            //     char: 'market'
-            // },
+        // This is currently done after calling.
+        // res.forEach(holding => {
+        //     this.getTickerData(holding.ticker).subscribe(tickerData => {
+        //         console.log(tickerData);
+        //         holding.data$ = tickerData;
+        //     });
+        // });
 
         return res;
     }
 
     getTickerData(ticker: string): Observable<any> {
-        const url = `${this.marketUrl}/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${this.marketKey}`;
+        const url = `${this.marketUrl}/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${this.marketKeys[this.keyIndex]}`;
+        this.incrementKey();
+
         console.log(`GET: ${url}`);
         return this.httpClient.get<any>(url).pipe(
             tap(_ => console.log('fetched TickerData')),
