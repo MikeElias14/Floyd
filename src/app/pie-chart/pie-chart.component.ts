@@ -1,4 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { DataService } from './../data.service';
+import { Component, Input, OnInit } from '@angular/core';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartOptions } from 'chart.js';
 
 @Component({
   selector: 'app-pie-chart',
@@ -8,11 +11,13 @@ import { Component, Input } from '@angular/core';
 
 export class PieChartComponent {
 
-  @Input()
-  data: [];
+  options: ChartOptions = {
+    responsive: true,
+  };
 
   @Input()
-  labels: [];
+  data: Array<string>;
 
-  type = 'pie';
+  @Input()
+  labels: Array<number>;
 }
