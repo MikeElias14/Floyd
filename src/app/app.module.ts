@@ -1,3 +1,5 @@
+import { UiStore } from './stores/ui.store';
+import { DataStore } from './stores/data.store';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { AppConfig } from './app.config';
@@ -7,7 +9,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { ChartsModule } from 'ng2-charts';
 import { PieChartComponent } from './pie-chart/pie-chart.component';
-import { DataService } from './data.service';
+import { DataService } from './stores/data.service';
 
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();
@@ -26,6 +28,8 @@ export function initializeApp(appConfig: AppConfig) {
   ],
   providers: [
     DataService,
+    DataStore,
+    UiStore,
     AppConfig,
        {
         provide: APP_INITIALIZER,

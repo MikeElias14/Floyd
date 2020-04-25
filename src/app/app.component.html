@@ -1,9 +1,4 @@
 <div class="container">
-  <ul class="nav nav-tabs">
-    <li class="nav-item">
-      <a class="nav-link" routerLink="/pie-chart">Pie Chart</a>
-    </li>
-  </ul>
   <!-- <div>
     <app-pie-chart *ngFor="let holding of holdings"
       [labels]="myTickers"
@@ -11,28 +6,11 @@
     </app-pie-chart>
   </div> -->
 
-
-
-  <p>My Tickers: {{ dateString }}</p>
-  <ul>
+  <p>My Tickers: </p>
+  <p>{{holdings}}</p>
+  <!-- <ul>
     <li *ngFor="let holding of holdings">
       {{holding.ticker}}
     </li>
-  </ul>
-  <ul>
-
-  <p>Ticker Value:</p>
-    <li *ngFor="let holding of holdings">
-      {{holding.ammount * holding.data$['Time Series (Daily)'][dateString]['4. close'] | number }}
-    </li>
-  </ul>
-
-    <p>My Tickers:</p>
-  <ul>
-    <li>
-      {{holdings}}
-    </li>
-  </ul>
-
-  
+  </ul> -->
 </div>

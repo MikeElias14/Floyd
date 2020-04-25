@@ -1,16 +1,16 @@
-import { Observable } from 'rxjs';
 import { IHolding } from './app-holdings.model';
 
 export class Holding implements IHolding {
     ticker: string;
-    ammount: number;
+    numberShares: number;
+    sharePrice: number;
+    totalPrice: number;
     type: string;
-    data$: Observable<any>;
 
-    constructor(ticker: string, ammount: number, type: string, data$?: any) {
+    constructor(ticker: string, numberShares: number, sharePrice: number, totalPrice: number, type: string) {
         this.ticker = ticker;
-        this.ammount = ammount;
+        this.numberShares = numberShares;
+        this.totalPrice = totalPrice;
         this.type = type;
-        this.data$ = data$ || null;
     }
 }

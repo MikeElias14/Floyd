@@ -1,4 +1,3 @@
-import { DataService } from './../data.service';
 import { Component, Input, OnInit } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartOptions } from 'chart.js';
