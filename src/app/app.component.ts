@@ -1,9 +1,7 @@
-import { UiStore } from './stores/ui.store';
 import { DataStore } from './stores/data.store';
-import { Observable, forkJoin } from 'rxjs';
-import { Holding } from './models/app.holdings';
+import { Holding } from './models/holding.model';
 import { Component, OnInit } from '@angular/core';
-import { DataService } from './stores/data.service';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-root',
@@ -12,16 +10,29 @@ import { DataService } from './stores/data.service';
 })
 export class AppComponent implements OnInit {
   title = 'floyd';
-  rawHoldingsData: Observable<any>;
-  holdings: Holding[];
 
-  constructor(
-    private service: DataService,
-    private datastore: DataStore,
-    private uiStore: UiStore
-    ) { }
+  holdings = new MatTableDataSource<Holding>();
+  objName = 'Holdings'; // This must match the ob jof the localCashe... I should global var this or something.
+
+  displayedColumns: string[] = ['ticker', 'numberShares', 'sharePrice', 'totalPrice', 'type'];
+
+  constructor(public dataStore: DataStore) {
+
+    this.dataStore.holdingsUpdated.subscribe(
+      (newData: any) => {
+        this.holdings = new MatTableDataSource(newData);
+      }
+    );
+  }
 
   ngOnInit() {
+    this.dataStore.holdingsUpdated.emit(
+      // use the local storage if there until HTTP call retrieves something
+      JSON.parse(localStorage[this.dataStore.dataObjects.getCacheName(this.objName)] || '[]')
+    );
   }
+    refreshHoldings() {
+      this.dataStore.loadHoldings();
+    }
 }
 
