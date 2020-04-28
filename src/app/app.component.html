@@ -1,7 +1,34 @@
 <div>
+  <h5>Total: {{ totalValues.total | number }}</h5>
+  <h5>REIT Total:  {{ totalValues.reit }}</h5>
+  <h5>gold Total:  {{ totalValues.gold }}</h5>
+  <h5>other Total:  {{ totalValues.other }}</h5>
+  <h5>market Total:  {{ totalValues.market }}</h5>
+</div>
+
+<div>
+  <app-pie-chart
+    [labels]="pieTickerLabels"
+    [data]="pieTickerData"
+    [legend]="true">
+  </app-pie-chart>
+</div>
+
+<div>
+  <app-pie-chart
+    [labels]="pieTypeLabels"
+    [data]="pieTypeData"
+    [legend]="true">
+  </app-pie-chart>
+</div>
+
+
+<div>
   <button class="mat-stroked-button" (click)="refreshHoldings()">Refresh Holdings</button>
   <br>
-  
+  <mat-form-field>
+    <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+  </mat-form-field>
   <table mat-table [dataSource]="holdings" class="mat-elevation-z8"
          matSort matSortActive="created"
          matSortDisableClear
@@ -30,7 +57,13 @@
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Price</th>
       <td mat-cell *matCellDef="let record"> {{record.totalPrice}} </td>
     </ng-container>
-    
+
+     <!-- exchange Column -->
+     <ng-container matColumnDef="exchange">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Exchange</th>
+      <td mat-cell *matCellDef="let record"> {{record.exchange}} </td>
+    </ng-container>
+
     <!-- type Column -->
     <ng-container matColumnDef="type">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
@@ -42,5 +75,11 @@
 
   </table>
 
+  <mat-paginator 
+    [length]="holdings.data.length"
+    [pageSize]="10"
+    [pageSizeOptions]="mpPageSizeOptions"
+    (page)="pageEvent = $event">
+  </mat-paginator>  
 
 </div>
