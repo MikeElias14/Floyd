@@ -45,15 +45,18 @@ export class DataStore {
         const tempArray: Array<Holding> = [];
 
         for (const i of dataReceived) {
-          tempArray.push(
-            new Holding (
-                i.title.$t,
-                i.gsx$numbershares.$t,
-                i.gsx$shareprice.$t,
-                i.gsx$totalprice.$t,
-                i.gsx$type.$t
+            const ticker = i.title.$t.split(':'); // [exchange, ticker]
 
-            ));
+            tempArray.push(
+                new Holding (
+                    ticker[1].trim(),
+                    ticker[0].trim(),
+                    Number(i.gsx$numbershares.$t.trim()),
+                    Number(i.gsx$shareprice.$t.replace('$', '').trim()),
+                    Number(i.gsx$totalprice.$t.replace('$', '').trim()),
+                    i.gsx$type.$t.trim()
+
+                ));
         }
         return tempArray;
       }

@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import { Component, Input, OnInit } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartOptions } from 'chart.js';
@@ -15,8 +16,11 @@ export class PieChartComponent {
   };
 
   @Input()
-  data: Array<string>;
+  data: string[];
 
   @Input()
-  labels: Array<number>;
+  labels: number[];
+
+  @Input()
+  legend = true;
 }
