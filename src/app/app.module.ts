@@ -11,6 +11,7 @@ import { ChartsModule } from 'ng2-charts';
 import { PieChartComponent } from './pie-chart/pie-chart.component';
 import { DataService } from './stores/data.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HomeComponent } from './home/home.component';
 
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();
@@ -19,7 +20,8 @@ export function initializeApp(appConfig: AppConfig) {
 @NgModule({
   declarations: [
     AppComponent,
-    PieChartComponent
+    PieChartComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
