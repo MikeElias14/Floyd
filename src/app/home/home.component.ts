@@ -1,5 +1,5 @@
-import { DataStore } from '../stores/data.store';
-import { Holding } from '../models/holding.model';
+import { MyDataStore } from '../stores/my.store';
+import { MyHolding } from '../models/holding.model';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -12,8 +12,8 @@ import { MatSort } from '@angular/material/sort';
 })
 export class HomeComponent implements OnInit {
 
-  holdings = new MatTableDataSource<Holding>();
-  holdingsObjName = 'Holdings';
+  myHoldings = new MatTableDataSource<MyHolding>();
+  holdingsObjName = 'MyHoldings';
 
   pieTickerData: number[] = [];
   pieTickerLabels: string[] = [];
@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit {
     other: 0
   };
 
-  displayedColumns: string[] = ['ticker', 'numberShares', 'sharePrice', 'totalPrice', 'exchange', 'type'];
+  displayedColumns: string[] = ['ticker', 'numberShares', 'sharePrice', 'totalPrice', 'exchange', 'sector'];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   mpPageSizeOptions: number[] = [5, 10, 25, 100];
@@ -38,20 +38,20 @@ export class HomeComponent implements OnInit {
 
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(public dataStore: DataStore) {
+  constructor(public dataStore: MyDataStore) {
 
-    this.dataStore.holdingsUpdated.subscribe(
+    this.dataStore.myHoldingsUpdated.subscribe(
       (newData: any) => {
-        this.holdings = new MatTableDataSource(newData);
-        this.holdings.paginator = this.paginator;
-        this.holdings.sort = this.sort;
+        this.myHoldings = new MatTableDataSource(newData);
+        this.myHoldings.paginator = this.paginator;
+        this.myHoldings.sort = this.sort;
 
         this.calcTotalValues();
         this.updateCharts();
       }
     );
 
-    this.holdings.sortingDataAccessor = (item, property) => {
+    this.myHoldings.sortingDataAccessor = (item, property) => {
       switch (property) {
         default: return item[property];
       }
@@ -60,35 +60,35 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.dataStore.holdingsUpdated.emit(
+    this.dataStore.myHoldingsUpdated.emit(
       // use the local storage if there until HTTP call retrieves something
       JSON.parse(localStorage[this.dataStore.dataObjects.getCacheName(this.holdingsObjName)] || '[]')
     );
   }
 
-  refreshHoldings() {
-    this.dataStore.loadHoldings();
+  refreshMyHoldings() {
+    this.dataStore.loadMyHoldings();
   }
 
   applyFilter(filterValue: string) {
-    this.holdings.filter = filterValue.trim().toLowerCase();
+    this.myHoldings.filter = filterValue.trim().toLowerCase();
 
-    if (this.holdings.paginator) {
-      this.holdings.paginator.firstPage();
+    if (this.myHoldings.paginator) {
+      this.myHoldings.paginator.firstPage();
     }
   }
 
   calcTotalValues() {
     this.resetTotals();
-    this.holdings.data.forEach(holding => {
+    this.myHoldings.data.forEach(holding => {
       this.totalValues.total += holding.totalPrice;
-      this.totalValues[holding.type] += holding.totalPrice;
+      this.totalValues[holding.sector] += holding.totalPrice;
     });
   }
 
   updateCharts() {
     this.resetChartData();
-    this.holdings.data.forEach(holding => {
+    this.myHoldings.data.forEach(holding => {
       this.pieTickerData.push(holding.totalPrice);
       this.pieTickerLabels.push(holding.ticker);
     });

@@ -6,7 +6,8 @@ import { catchError, tap, map } from 'rxjs/operators';
 
 @Injectable()
 export class DataService {
-    protected holdingsUrl = AppConfig.settings.holdings_sheet_url;
+    protected myHoldingsUrl = AppConfig.settings.my_holdings_sheet_url;
+    protected marketHoldingsUrl = AppConfig.settings.market_holdings_sheet_url;
 
     constructor(private httpClient: HttpClient) {}
 
@@ -17,15 +18,25 @@ export class DataService {
         };
       }
 
-    getHoldings(): Observable<any> {
-        console.log(`GET: ${this.holdingsUrl}`);
+    getMyHoldings(): Observable<any> {
+        console.log(`GET: ${this.myHoldingsUrl}`);
 
-        const res = this.httpClient.get<any>(this.holdingsUrl).pipe(
+        const res = this.httpClient.get<any>(this.myHoldingsUrl).pipe(
           map(obj => obj.feed.entry),
           catchError(this.handleError())
         );
 
         return res;
-
     }
+
+    getMarketHoldings(): Observable<any> {
+      console.log(`GET: ${this.marketHoldingsUrl}`);
+
+      const res = this.httpClient.get<any>(this.marketHoldingsUrl).pipe(
+        map(obj => obj.feed.entry),
+        catchError(this.handleError())
+      );
+
+      return res;
+  }
 }

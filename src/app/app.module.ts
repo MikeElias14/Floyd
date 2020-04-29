@@ -1,5 +1,6 @@
+import { MarketDataStore } from './stores/market.store';
 import { MaterialModule } from './material.module';
-import { DataStore } from './stores/data.store';
+import { MyDataStore } from './stores/my.store';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { AppConfig } from './app.config';
@@ -12,6 +13,7 @@ import { PieChartComponent } from './pie-chart/pie-chart.component';
 import { DataService } from './stores/data.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HomeComponent } from './home/home.component';
+import { AllStocksComponent } from './all-stocks/all-stocks.component';
 
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();
@@ -21,7 +23,8 @@ export function initializeApp(appConfig: AppConfig) {
   declarations: [
     AppComponent,
     PieChartComponent,
-    HomeComponent
+    HomeComponent,
+    AllStocksComponent
   ],
   imports: [
     BrowserModule,
@@ -33,7 +36,8 @@ export function initializeApp(appConfig: AppConfig) {
   ],
   providers: [
     DataService,
-    DataStore,
+    MyDataStore,
+    MarketDataStore,
     AppConfig,
        {
         provide: APP_INITIALIZER,

@@ -1,3 +1,5 @@
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
@@ -14,7 +16,9 @@ import { MatTableModule } from '@angular/material/table';
     MatFormFieldModule,
     MatInputModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    MatToolbarModule,
+    MatTabsModule
   ],
   exports: [
     MatButtonModule,
@@ -22,7 +26,9 @@ import { MatTableModule } from '@angular/material/table';
     MatFormFieldModule,
     MatInputModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    MatToolbarModule,
+    MatTabsModule
   ]
 })
 export class MaterialModule { }
