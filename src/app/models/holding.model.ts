@@ -35,9 +35,10 @@ export class MarketHolding implements IMarketHolding {
     high52: number;
     low52: number;
     changepct: number;
+    marketcap: number;
 
     constructor(ticker: string, exchange: string, name: string, sector: string,
-                price: number, high52: number, low52: number, changepct: number) {
+                price: number, high52: number, low52: number, changepct: number, marketcap: number) {
         this.ticker = ticker;
         this.exchange = exchange;
         this.name = name;
@@ -46,6 +47,7 @@ export class MarketHolding implements IMarketHolding {
         this.high52 = high52;
         this.low52 = low52;
         this.changepct = changepct;
+        this.marketcap = marketcap;
     }
 }
 
@@ -58,6 +60,7 @@ export interface IMarketHolding {
     high52: number;
     low52: number;
     changepct: number;
+    marketcap: number;
 }
 
 export interface IAdvancedHolding {

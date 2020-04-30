@@ -1,5 +1,5 @@
-import { MyDataStore } from '../stores/my.store';
 import { MyHolding } from '../models/holding.model';
+import { DataStore } from '../stores/data.store';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -33,21 +33,25 @@ export class HomeComponent implements OnInit {
   displayedColumns: string[] = ['ticker', 'numberShares', 'sharePrice', 'totalPrice', 'exchange', 'sector'];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  mpPageSizeOptions: number[] = [5, 10, 25, 100];
+  mpPageSizeOptions: number[] = [10, 25, 100];
   pageEvent: PageEvent;
 
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(public dataStore: MyDataStore) {
+  constructor(public dataStore: DataStore) {
 
+    // We can load the table like this because we don't have huge data.
+    // This method does not work for all-stocks for example.
     this.dataStore.myHoldingsUpdated.subscribe(
       (newData: any) => {
         this.myHoldings = new MatTableDataSource(newData);
+
         this.myHoldings.paginator = this.paginator;
         this.myHoldings.sort = this.sort;
 
         this.calcTotalValues();
         this.updateCharts();
+
       }
     );
 
@@ -117,6 +121,4 @@ export class HomeComponent implements OnInit {
     this.pieTypeData = [];
     this.pieTypeLabels = [];
   }
-
-
 }

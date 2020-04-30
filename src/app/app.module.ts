@@ -1,6 +1,5 @@
-import { MarketDataStore } from './stores/market.store';
 import { MaterialModule } from './material.module';
-import { MyDataStore } from './stores/my.store';
+import { DataStore } from './stores/data.store';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { AppConfig } from './app.config';
@@ -36,8 +35,7 @@ export function initializeApp(appConfig: AppConfig) {
   ],
   providers: [
     DataService,
-    MyDataStore,
-    MarketDataStore,
+    DataStore,
     AppConfig,
        {
         provide: APP_INITIALIZER,

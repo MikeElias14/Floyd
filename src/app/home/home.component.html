@@ -1,8 +1,8 @@
-<h5>Total: {{ totalValues.total | number }}</h5>
+<!-- <h5>Total: {{ totalValues.total | number }}</h5>
 <h5>REIT Total:  {{ totalValues.reit }}</h5>
 <h5>gold Total:  {{ totalValues.gold }}</h5>
 <h5>other Total:  {{ totalValues.other }}</h5>
-<h5>market Total:  {{ totalValues.market }}</h5>
+<h5>market Total:  {{ totalValues.market }}</h5> -->
 
 <div>
   <div class="left chart">
@@ -65,9 +65,7 @@
     
     <button class="mat-stroked-button" (click)="refreshMyHoldings()">Refresh Holdings</button>
 
-    <mat-paginator 
-      [length]="myHoldings.data.length"
-      [pageSize]="10"
+    <mat-paginator
       [pageSizeOptions]="mpPageSizeOptions"
       (page)="pageEvent = $event">
     </mat-paginator>  
