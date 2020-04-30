@@ -1,6 +1,4 @@
-import { Observable } from 'rxjs';
 import { Component, Input, OnInit } from '@angular/core';
-import { BaseChartDirective } from 'ng2-charts';
 import { ChartOptions } from 'chart.js';
 
 @Component({

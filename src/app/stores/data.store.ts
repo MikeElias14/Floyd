@@ -1,77 +1,116 @@
+import { MarketHolding } from '../models/holding.model';
 import { DataService } from './data.service';
 import { Injectable, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Holding } from '../models/holding.model';
+import { MyHolding } from '../models/holding.model';
 
 @Injectable()
 export class DataStore {
-    dataObjects = new DataObjects();
+  dataObjects = new DataObjects();
 
-    lastUpdated = new Date();
-    holdings$: Observable<Array<Holding>>;
-    holdingsUpdated = new EventEmitter<Array<Holding>>();
+  myLastUpdated = new Date();
+  myHoldings$: Observable<Array<MyHolding>>;
+  myHoldingsUpdated = new EventEmitter<Array<MyHolding>>();
 
-    constructor(private dataService: DataService) {
-        this.loadHoldings();
-    }
+  marketLastUpdated = new Date();
+  marketHoldings$: Observable<Array<MarketHolding>>;
+  marketHoldingsUpdated = new EventEmitter<Array<MarketHolding>>();
 
-    public static setLocal(whatData: any, cacheName: string) {
-        localStorage[cacheName] = JSON.stringify(whatData);
+  constructor(private dataService: DataService) {
+    this.loadMyHoldings();
+    this.loadMarketHoldings();
+  }
+
+  public static setLocal(whatData: any, cacheName: string) {
+    localStorage[cacheName] = JSON.stringify(whatData);
+  }
+
+  refreshMyData() {
+    this.loadMyHoldings();
+    this.myLastUpdated = new Date();
+  }
+
+  loadMyHoldings() {
+    let holdings: Array<MyHolding> = [];
+    this.myHoldings$ = this.dataService.getMyHoldings();
+    this.myHoldings$.subscribe(next => {
+      if (next != null) {
+      holdings = this.transformMyHoldings(next);
       }
 
-    refreshData() {
-        this.refreshAll();
+      DataStore.setLocal(holdings, this.dataObjects.getCacheName('MyHoldings'));
+      this.myHoldingsUpdated.emit(holdings);
+    });
+  }
+
+  transformMyHoldings(dataReceived: Array<any>): Array<MyHolding> {
+    const tempArray: Array<MyHolding> = [];
+
+    for (const i of dataReceived) {
+      tempArray.push(
+        new MyHolding (
+          i.gsx$ticker.$t.trim(),
+          i.gsx$exchange.$t.trim(),
+          Number(i.gsx$numbershares.$t.trim()),
+          Number(i.gsx$shareprice.$t.replace('$', '').trim()),
+          Number(i.gsx$totalprice.$t.replace('$', '').trim()),
+          i.gsx$sector.$t.trim()
+        )
+      );
     }
+    return tempArray;
+  }
 
-    refreshAll() {
-        this.loadHoldings();
-        this.lastUpdated = new Date();
-    }
+  refreshMarketData() {
+    this.loadMarketHoldings();
+    this.marketLastUpdated = new Date();
+  }
 
-    loadHoldings() {
-        let holdings: Array<Holding> = [];
-        this.holdings$ = this.dataService.getHoldings();
-        this.holdings$.subscribe(next => {
-           if (next != null) {
-            holdings = this.transformHoldings(next);
-           }
-
-           DataStore.setLocal(holdings, this.dataObjects.getCacheName('Holdings'));
-           this.holdingsUpdated.emit(holdings);
-        });
-    }
-
-    transformHoldings(dataReceived: Array<any>): Array<Holding> {
-        const tempArray: Array<Holding> = [];
-
-        for (const i of dataReceived) {
-            const ticker = i.title.$t.split(':'); // [exchange, ticker]
-
-            tempArray.push(
-                new Holding (
-                    ticker[1].trim(),
-                    ticker[0].trim(),
-                    Number(i.gsx$numbershares.$t.trim()),
-                    Number(i.gsx$shareprice.$t.replace('$', '').trim()),
-                    Number(i.gsx$totalprice.$t.replace('$', '').trim()),
-                    i.gsx$type.$t.trim()
-
-                ));
-        }
-        return tempArray;
+  loadMarketHoldings() {
+    let holdings: Array<MarketHolding> = [];
+    this.marketHoldings$ = this.dataService.getTSEHoldings();
+    this.marketHoldings$.subscribe(next => {
+      if (next != null) {
+      holdings = this.transformMarketHoldings(next);
       }
+
+      DataStore.setLocal(holdings, this.dataObjects.getCacheName('MarketHoldings'));
+      this.marketHoldingsUpdated.emit(holdings);
+    });
+  }
+
+  transformMarketHoldings(dataReceived: Array<any>): Array<MarketHolding> {
+    const tempArray: Array<MarketHolding> = [];
+
+    for (const i of dataReceived) {
+      tempArray.push(
+        new MarketHolding (
+          i.gsx$ticker.$t.trim(),
+          i.gsx$exchange.$t.trim(),
+          i.gsx$name.$t.trim(),
+          i.gsx$sector.$t.trim(),
+          Number(i.gsx$price.$t.trim()),
+          Number(i.gsx$high52.$t.trim()),
+          Number(i.gsx$low52.$t.trim()),
+          Number(i.gsx$changepct.$t.trim()),
+          Number(i.gsx$marketcap.$t.trim())
+        )
+      );
+    }
+    return tempArray;
+  }
 }
 
 export class DataObjects {
+  dataObjects =  [
+    {objName: 'MyHoldings', cache: 'myHoldingsCache', useYN: 'Y', labelName: 'MyHolding'},
+    {objName: 'MarketHoldings', cache: 'marketHoldingsCache', useYN: 'Y', labelName: 'MarketHolding'}
+  ];
 
-    dataObjects =  [
-      {objName: 'Holdings', tabID: '1', cache: 'holdingsCache', useYN: 'Y', labelName: 'Holding'}
-    ];
-
-    getCacheName(whichObj: string ): string {
-      return this.dataObjects.find(myObj => myObj.objName === whichObj).cache;
-    }
-    getLabelName(whichObj: string ): string {
-      return this.dataObjects.find(myObj => myObj.objName === whichObj).labelName;
-    }
+  getCacheName(whichObj: string ): string {
+    return this.dataObjects.find(myObj => myObj.objName === whichObj).cache;
   }
+  getLabelName(whichObj: string ): string {
+    return this.dataObjects.find(myObj => myObj.objName === whichObj).labelName;
+  }
+}
