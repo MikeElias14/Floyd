@@ -25,7 +25,7 @@ export class AllStocksComponent implements OnInit, AfterViewInit {
 
   holdingsObjName = 'MarketHoldings';
 
-  displayedColumns: string[] = ['ticker', 'name', 'price', 'high52', 'low52', 'marketcap', 'exchange', 'sector'];
+  displayedColumns: string[] = ['ticker', 'name', 'price',  'changePrice', 'changepct', 'marketcap', 'exchange', 'sector'];
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;

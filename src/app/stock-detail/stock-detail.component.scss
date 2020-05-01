@@ -1,4 +1,11 @@
-.button-row button,
-.button-row a {
-  margin-right: 8px;
+.button-row button{
+  margin: 8px;
+}
+
+.negative {
+  color: red;
+}
+
+.positive {
+  color: green;
 }

@@ -10,6 +10,14 @@ export class LineChartComponent {
 
   options: ChartOptions = {
     responsive: true,
+    elements: {
+      point: {
+        radius: 1
+      },
+      line: {
+        tension: 0
+      }
+    }
   };
 
   @Input()

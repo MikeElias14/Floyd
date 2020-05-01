@@ -13,9 +13,18 @@ export class StockDetailComponent implements OnInit {
 
   lineDataset: Array<ChartDataSets> = [];
   lineLabels: Array<string> = [];
-  chartDays = 0;
+  chartDays = 250; // Default one year
 
   historyObjName = 'History';
+
+  changePct = {
+    oneWeek: 0,
+    oneMonth: 0,
+    threeMonths: 0,
+    sixMonths: 0,
+    oneYear: 0,
+    fiveYears: 0
+  }
 
   constructor(public dataStore: DataStore) {
     this.dataStore.historyUpdated.subscribe(
@@ -23,6 +32,7 @@ export class StockDetailComponent implements OnInit {
         this.holding.history = newData;
 
         this.updateChart();
+        this.getChangePct();
       }
     );
   }
@@ -40,6 +50,15 @@ export class StockDetailComponent implements OnInit {
     this.dataStore.refreshHistory(ticker, exchange);
   }
 
+  getChangePct() {
+    this.changePct.oneWeek = ((this.holding.price - this.holding.history[5].price) / this.holding.price) * 100;
+    this.changePct.oneMonth = ((this.holding.price - this.holding.history[20].price) / this.holding.price) * 100;
+    this.changePct.threeMonths = ((this.holding.price - this.holding.history[60].price) / this.holding.price) * 100;
+    this.changePct.sixMonths = ((this.holding.price - this.holding.history[125].price) / this.holding.price) * 100;
+    this.changePct.oneYear = ((this.holding.price - this.holding.history[250].price) / this.holding.price) * 100;
+    this.changePct.fiveYears = ((this.holding.price - this.holding.history[1250].price) / this.holding.price) * 100;
+  }
+
   updateChart() {
     this.resetChartData();
     let prices: Array<number> = [];
@@ -49,13 +68,13 @@ export class StockDetailComponent implements OnInit {
       this.lineLabels.push(String(element.date));
     });
 
-    prices.reverse();
-    this.lineLabels.reverse();
-
     if (this.chartDays !== 0) {
       prices = prices.slice(0, this.chartDays);
       this.lineLabels = this.lineLabels.slice(0, this.chartDays);
     }
+
+    prices.reverse();
+    this.lineLabels.reverse();
 
     this.lineDataset.push({
       data: prices,

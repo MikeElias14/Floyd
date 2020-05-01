@@ -1,12 +1,50 @@
 
 <div class="button-row">
-  <button mat-raised-button (click)="setTimeframe(5)">1 Week</button>
-  <button mat-raised-button (click)="setTimeframe(30)">1 Month</button>
-  <button mat-raised-button (click)="setTimeframe(90)">3 Months</button>
-  <button mat-raised-button (click)="setTimeframe(180)">6 Months</button>
-  <button mat-raised-button (click)="setTimeframe(365)">1 Year</button>
-  <button mat-raised-button (click)="setTimeframe(1825)">5 Years</button>
-  <button mat-raised-button (click)="setTimeframe(0)">All Time</button>
+  <button mat-raised-button (click)="setTimeframe(5)">
+    1 Week 
+      <span [class.positive]= "changePct.oneWeek >= 0" [class.negative]= "changePct.oneWeek < 0">
+        ({{ changePct.oneWeek | number }}%)
+      </span>
+  </button>
+
+  <button mat-raised-button (click)="setTimeframe(20)">
+    1 Month 
+      <span [class.positive]= "changePct.oneMonth >= 0" [class.negative]= "changePct.oneMonth < 0">
+        ({{ changePct.oneMonth | number }}%)
+      </span>
+  </button>
+
+  <button mat-raised-button (click)="setTimeframe(60)">
+    3 Months 
+      <span [class.positive]= "changePct.threeMonths >= 0" [class.negative]= "changePct.threeMonths < 0">
+        ({{ changePct.threeMonths | number }}%)
+      </span>
+  </button>
+
+  <button mat-raised-button (click)="setTimeframe(125)">
+    6 Months 
+      <span [class.positive]= "changePct.sixMonths >= 0" [class.negative]= "changePct.sixMonths < 0">
+        ({{ changePct.sixMonths | number }}%)
+      </span>
+  </button>
+
+  <button mat-raised-button (click)="setTimeframe(250)">
+    1 Year 
+      <span [class.positive]= "changePct.oneYear >= 0" [class.negative]= "changePct.oneYear < 0">
+        ({{ changePct.oneYear | number }}%)
+      </span>
+  </button>
+
+  <button mat-raised-button (click)="setTimeframe(1250)">
+    5 Years 
+      <span [class.positive]= "changePct.fiveYears >= 0" [class.negative]= "changePct.fiveYears < 0">
+        ({{ changePct.fiveYears | number }}%)
+      </span>
+  </button>
+
+  <button mat-raised-button (click)="setTimeframe(0)">
+    All Time 
+  </button>
   
 </div>
 

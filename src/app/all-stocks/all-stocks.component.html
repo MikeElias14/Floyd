@@ -1,16 +1,18 @@
-<div>
-  <mat-form-field>
+<div class="center">
+  <mat-form-field class="left">
     <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
   </mat-form-field>
   
-  <button class="mat-stroked-button" (click)="refreshMarketHoldings()">Refresh Holdings</button>
+  <button class="mat-stroked-button" (click)="refreshMarketHoldings()">Refresh</button>
 
-  <mat-paginator 
+  <mat-paginator class="right"
     [pageSizeOptions]="mpPageSizeOptions"
     (page)="pageEvent = $event">
   </mat-paginator> 
+</div>
 
-  <mat-table [dataSource]="marketHoldings" class="table mat-elevation-z8"
+<div>
+  <table mat-table [dataSource]="marketHoldings" class="center mat-elevation-z8"
       matSort matSortActive="marketcap"
       matSortDisableClear
       matSortDirection="desc">
@@ -30,25 +32,31 @@
     <!-- price Column -->
     <ng-container matColumnDef="price">
       <mat-header-cell *matHeaderCellDef mat-sort-header>Price</mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.price}} </mat-cell>
+      <mat-cell *matCellDef="let element"> ${{element.price| number }} </mat-cell>
     </ng-container>
 
-    <!-- high52 Column -->
-    <ng-container matColumnDef="high52">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>52-week High</mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.high52}} </mat-cell>
+    <!-- changePrice Column -->
+    <ng-container matColumnDef="changePrice">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Change ($)</mat-header-cell>
+      <mat-cell *matCellDef="let element"
+        [class.positive]= "element.changepct >= 0"
+        [class.negative]= "element.changepct < 0"
+      > ${{ element.price - (element.price / (1+element.changepct/100)) | number}}</mat-cell>
     </ng-container>
 
-    <!-- low52 Column -->
-    <ng-container matColumnDef="low52">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>52-week Low</mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.low52}} </mat-cell>
+    <!-- changepct Column -->
+    <ng-container matColumnDef="changepct">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Change (%)</mat-header-cell>
+      <mat-cell *matCellDef="let element"
+        [class.positive]= "element.changepct >= 0"
+        [class.negative]= "element.changepct < 0"
+      > {{element.changepct | number}}%</mat-cell>
     </ng-container>
 
     <!-- marketcap Column -->
     <ng-container matColumnDef="marketcap">
       <mat-header-cell *matHeaderCellDef mat-sort-header>Market Cap</mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.marketcap}} </mat-cell>
+      <mat-cell *matCellDef="let element"> ${{element.marketcap | number}} </mat-cell>
     </ng-container>
 
     <!-- exchange Column -->
@@ -70,7 +78,7 @@
       [cdkDetailRow]="row"
       [cdkDetailRowTpl]="tpl">
 		</mat-row>
-	</mat-table>
+	</table>
 </div>
 
 <ng-template #tpl let-element>

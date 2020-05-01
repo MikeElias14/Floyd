@@ -1,6 +1,22 @@
-.table {
-  width: 80%;
+.center {
+  width: 90%;
   margin: auto;
+}
+
+.left {
+  float: left;
+}
+
+.right  {
+  float: right;
+}
+
+div button {
+  margin: 8px;
+}
+
+div mat-form-field {
+  margin: 8px;
 }
 
 .element-row:not(.expanded) {
@@ -13,4 +29,12 @@
 
 .element-row.expanded {
   border-bottom-color: transparent;
+}
+
+.negative {
+  color: red;
+}
+
+.positive {
+  color: green;
 }
