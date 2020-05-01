@@ -1,4 +1,4 @@
-import { MyHolding, MarketHolding, AdvHolding, DatePrice } from './../models/holding.model';
+import { MyHolding, MarketHolding, DatePrice } from './../models/holding.model';
 import { DataService } from './data.service';
 import { Injectable, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -15,9 +15,9 @@ export class DataStore {
   marketHoldings$: Observable<Array<MarketHolding>>;
   marketHoldingsUpdated = new EventEmitter<Array<MarketHolding>>();
 
-  advLastUpdated = new Date();
-  advHoldings$: Observable<Array<AdvHolding>>;
-  advHoldingsUpdated = new EventEmitter<Array<AdvHolding>>();
+  historyLastUpdated = new Date();
+  history$: Observable<Array<DatePrice>>;
+  historyUpdated = new EventEmitter<Array<DatePrice>>();
 
   constructor(private dataService: DataService) {
     this.loadMyHoldings();
@@ -59,7 +59,8 @@ export class DataStore {
           Number(i.gsx$numbershares.$t.trim()),
           Number(i.gsx$shareprice.$t.replace('$', '').trim()),
           Number(i.gsx$totalprice.$t.replace('$', '').trim()),
-          i.gsx$sector.$t.trim()
+          i.gsx$sector.$t.trim(),
+          []
         )
       );
     }
@@ -101,7 +102,8 @@ export class DataStore {
           Number(i.gsx$high52.$t.trim()),
           Number(i.gsx$low52.$t.trim()),
           Number(i.gsx$changepct.$t.trim()),
-          Number(i.gsx$marketcap.$t.trim())
+          Number(i.gsx$marketcap.$t.trim()),
+          []
         )
       );
     }
@@ -109,46 +111,39 @@ export class DataStore {
   }
 
 
-  // Adv Holding
-  // TODO: Cash each one and look to retrieve it later rather than retrying new data?
+  // History
+  // TODO: Cash each one in the holding it belongs to
 
-  refreshAdvData(ticker: string, exchange: string) {
-    this.loadAdvHoldings(ticker, exchange);
-    this.advLastUpdated = new Date();
+  refreshHistory(ticker: string, exchange: string) {
+    this.loadHistory(ticker, exchange);
+    this.historyLastUpdated = new Date();
   }
 
-  loadAdvHoldings(ticker: string, exchange: string) {
-    let holdings: Array<AdvHolding> = [];
-    this.advHoldings$ = this.dataService.getAdvHolding(ticker, exchange);
-    this.advHoldings$.subscribe(next => {
+  loadHistory(ticker: string, exchange: string) {
+    let history: Array<DatePrice> = [];
+    this.history$ = this.dataService.getHistory(ticker, exchange);
+    this.history$.subscribe(next => {
       if (next != null) {
-        holdings = this.transformAdvHolding(ticker, exchange, next);
+        history = this.transformHistory(next);
       }
 
-      DataStore.setLocal(holdings, this.dataObjects.getCacheName('AdvHoldings'));
-      this.advHoldingsUpdated.emit(holdings);
+      DataStore.setLocal(history, this.dataObjects.getCacheName('History'));
+      this.historyUpdated.emit(history);
     });
   }
 
-  transformAdvHolding(ticker: string, exchange: string, dataReceived: Array<any>): Array<AdvHolding> {
-    const tempArray: Array<AdvHolding> = [];
-    const history: Array<any> = [];
+  transformHistory(dataReceived: Array<any>): Array<DatePrice> {
+    const history: Array<DatePrice> = [];
 
-    // let blah = dataReceived['Time Series (Daily)'];
-
-    dataReceived['Time Series (Daily)'].forEach(element => {
-      console.log(element.Key());
-      history.push( new DatePrice (String(element.Key()), Number(element['4. close:'])) );
-    });
-
-    // tempArray.push(
-    //   new AdvHolding (
-    //     ticker,
-    //     exchange,
-    //     dataReceived['Time Seriec (Daily)']
-    //   )
-    // );
-    return tempArray;
+    for (const [date, price] of Object.entries(dataReceived['Time Series (Daily)'])) {
+      history.push(
+        new DatePrice (
+          Number(price['4. close']),
+          String(date)
+        )
+      );
+    }
+    return history;
   }
 }
 
@@ -157,7 +152,7 @@ export class DataObjects {
   dataObjects =  [
     {objName: 'MyHoldings', cache: 'myHoldingsCache', useYN: 'Y', labelName: 'MyHolding'},
     {objName: 'MarketHoldings', cache: 'marketHoldingsCache', useYN: 'Y', labelName: 'MarketHolding'},
-    {objName: 'AdvHoldings', cache: 'advHoldingsCache', useYN: 'Y', labelName: 'AdvHolding'}
+    {objName: 'History', cache: 'historyCashe', useYN: 'Y', labelName: 'History'}
   ];
 
   getCacheName(whichObj: string ): string {

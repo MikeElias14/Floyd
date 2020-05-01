@@ -2,7 +2,7 @@ import { AppConfig } from './../app.config';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable} from 'rxjs';
-import { catchError, tap, map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
 export class DataService {
@@ -43,8 +43,8 @@ export class DataService {
     return res;
   }
 
-  getAdvHolding(ticker: string, exchange: string) {
-    console.log(`GET: AdvHolding: ${exchange} : ${ticker}`);
+  getHistory(ticker: string, exchange: string) {
+    console.log(`GET: History: ${exchange} : ${ticker}`);
 
     let symbol: string;
 
@@ -55,7 +55,7 @@ export class DataService {
     }
 
     const res = this.httpClient.get<any>(
-      `${this.alphaHoldingUrl}/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${this.alphaKey}`).pipe(
+      `${this.alphaHoldingUrl}/query?function=TIME_SERIES_DAILY&symbol=${symbol}&outputsize=full&apikey=${this.alphaKey}`).pipe(
       map(obj => obj),
       catchError(this.handleError())
     );

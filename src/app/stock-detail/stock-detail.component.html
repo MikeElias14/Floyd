@@ -1,1 +1,19 @@
-<p>stock-detail works! {{holding}}</p>
+
+<div class="button-row">
+  <button mat-raised-button (click)="setTimeframe(5)">1 Week</button>
+  <button mat-raised-button (click)="setTimeframe(30)">1 Month</button>
+  <button mat-raised-button (click)="setTimeframe(90)">3 Months</button>
+  <button mat-raised-button (click)="setTimeframe(180)">6 Months</button>
+  <button mat-raised-button (click)="setTimeframe(365)">1 Year</button>
+  <button mat-raised-button (click)="setTimeframe(1825)">5 Years</button>
+  <button mat-raised-button (click)="setTimeframe(0)">All Time</button>
+  
+</div>
+
+<div>
+  <app-line-chart
+    [datasets]="lineDataset"
+    [labels]="lineLabels"
+    [legend]="false">
+  </app-line-chart>
+</div>

@@ -20,7 +20,7 @@ export class HomeComponent implements OnInit {
   pieTypeData: number[] = [];
   pieTypeLabels: string[] = [];
 
-
+  // TODO: implement this as chartData
   totalValues = {
     total: 0,
     reit: 0,
