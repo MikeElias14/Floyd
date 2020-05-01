@@ -8,6 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { NgModule } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
+import {CdkTableModule} from '@angular/cdk/table';
+import {CdkTreeModule} from '@angular/cdk/tree';
 
 @NgModule({
   imports: [
@@ -18,7 +20,9 @@ import { MatTableModule } from '@angular/material/table';
     MatPaginatorModule,
     MatSortModule,
     MatToolbarModule,
-    MatTabsModule
+    MatTabsModule,
+    CdkTableModule,
+    CdkTreeModule
   ],
   exports: [
     MatButtonModule,
@@ -28,7 +32,9 @@ import { MatTableModule } from '@angular/material/table';
     MatPaginatorModule,
     MatSortModule,
     MatToolbarModule,
-    MatTabsModule
+    MatTabsModule,
+    CdkTableModule,
+    CdkTreeModule
   ]
 })
 export class MaterialModule { }

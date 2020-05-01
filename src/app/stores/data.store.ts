@@ -1,8 +1,7 @@
-import { MarketHolding } from '../models/holding.model';
+import { MyHolding, MarketHolding, AdvHolding, DatePrice } from './../models/holding.model';
 import { DataService } from './data.service';
 import { Injectable, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MyHolding } from '../models/holding.model';
 
 @Injectable()
 export class DataStore {
@@ -16,6 +15,10 @@ export class DataStore {
   marketHoldings$: Observable<Array<MarketHolding>>;
   marketHoldingsUpdated = new EventEmitter<Array<MarketHolding>>();
 
+  advLastUpdated = new Date();
+  advHoldings$: Observable<Array<AdvHolding>>;
+  advHoldingsUpdated = new EventEmitter<Array<AdvHolding>>();
+
   constructor(private dataService: DataService) {
     this.loadMyHoldings();
     this.loadMarketHoldings();
@@ -24,6 +27,8 @@ export class DataStore {
   public static setLocal(whatData: any, cacheName: string) {
     localStorage[cacheName] = JSON.stringify(whatData);
   }
+
+  // My Holdings
 
   refreshMyData() {
     this.loadMyHoldings();
@@ -35,7 +40,7 @@ export class DataStore {
     this.myHoldings$ = this.dataService.getMyHoldings();
     this.myHoldings$.subscribe(next => {
       if (next != null) {
-      holdings = this.transformMyHoldings(next);
+        holdings = this.transformMyHoldings(next);
       }
 
       DataStore.setLocal(holdings, this.dataObjects.getCacheName('MyHoldings'));
@@ -61,6 +66,9 @@ export class DataStore {
     return tempArray;
   }
 
+
+  // Market Holdings
+
   refreshMarketData() {
     this.loadMarketHoldings();
     this.marketLastUpdated = new Date();
@@ -71,7 +79,7 @@ export class DataStore {
     this.marketHoldings$ = this.dataService.getTSEHoldings();
     this.marketHoldings$.subscribe(next => {
       if (next != null) {
-      holdings = this.transformMarketHoldings(next);
+        holdings = this.transformMarketHoldings(next);
       }
 
       DataStore.setLocal(holdings, this.dataObjects.getCacheName('MarketHoldings'));
@@ -99,12 +107,57 @@ export class DataStore {
     }
     return tempArray;
   }
+
+
+  // Adv Holding
+  // TODO: Cash each one and look to retrieve it later rather than retrying new data?
+
+  refreshAdvData(ticker: string, exchange: string) {
+    this.loadAdvHoldings(ticker, exchange);
+    this.advLastUpdated = new Date();
+  }
+
+  loadAdvHoldings(ticker: string, exchange: string) {
+    let holdings: Array<AdvHolding> = [];
+    this.advHoldings$ = this.dataService.getAdvHolding(ticker, exchange);
+    this.advHoldings$.subscribe(next => {
+      if (next != null) {
+        holdings = this.transformAdvHolding(ticker, exchange, next);
+      }
+
+      DataStore.setLocal(holdings, this.dataObjects.getCacheName('AdvHoldings'));
+      this.advHoldingsUpdated.emit(holdings);
+    });
+  }
+
+  transformAdvHolding(ticker: string, exchange: string, dataReceived: Array<any>): Array<AdvHolding> {
+    const tempArray: Array<AdvHolding> = [];
+    const history: Array<any> = [];
+
+    // let blah = dataReceived['Time Series (Daily)'];
+
+    dataReceived['Time Series (Daily)'].forEach(element => {
+      console.log(element.Key());
+      history.push( new DatePrice (String(element.Key()), Number(element['4. close:'])) );
+    });
+
+    // tempArray.push(
+    //   new AdvHolding (
+    //     ticker,
+    //     exchange,
+    //     dataReceived['Time Seriec (Daily)']
+    //   )
+    // );
+    return tempArray;
+  }
 }
+
 
 export class DataObjects {
   dataObjects =  [
     {objName: 'MyHoldings', cache: 'myHoldingsCache', useYN: 'Y', labelName: 'MyHolding'},
-    {objName: 'MarketHoldings', cache: 'marketHoldingsCache', useYN: 'Y', labelName: 'MarketHolding'}
+    {objName: 'MarketHoldings', cache: 'marketHoldingsCache', useYN: 'Y', labelName: 'MarketHolding'},
+    {objName: 'AdvHoldings', cache: 'advHoldingsCache', useYN: 'Y', labelName: 'AdvHolding'}
   ];
 
   getCacheName(whichObj: string ): string {
