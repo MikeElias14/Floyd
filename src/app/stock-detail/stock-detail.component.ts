@@ -8,6 +8,8 @@ import { ChartDataSets } from 'chart.js';
   styleUrls: ['./stock-detail.component.scss']
 })
 export class StockDetailComponent implements OnInit {
+  // TODO: This should be passed by ref so that I can update the holding with info and hostory
+  // Then, check if it is there before getting it again.
   @Input()
   holding: any;
 
@@ -16,23 +18,31 @@ export class StockDetailComponent implements OnInit {
   chartDays = 250; // Default one year
 
   historyObjName = 'History';
+  infoObjName = 'Info';
 
   changePct = {
     oneWeek: 0,
     oneMonth: 0,
-    threeMonths: 0,
     sixMonths: 0,
     oneYear: 0,
     fiveYears: 0
   }
 
   constructor(public dataStore: DataStore) {
+    // Get History ( TODO: if not already there for holding)
     this.dataStore.historyUpdated.subscribe(
       (newData: any) => {
         this.holding.history = newData;
 
         this.updateChart();
         this.getChangePct();
+      }
+    );
+
+    // Get Info ( TODO: if not already there for holding)
+    this.dataStore.infoUpdated.subscribe(
+      (newData: any) => {
+        this.holding.info = newData[0];
       }
     );
   }
@@ -44,19 +54,28 @@ export class StockDetailComponent implements OnInit {
     );
 
     this.refreshHistory(this.holding.ticker, this.holding.exchange);
+    this.refreshInfo(this.holding.ticker, this.holding.exchange);
   }
+
+  // *** Get Data Functions ***
 
   refreshHistory(ticker: string, exchange: string) {
     this.dataStore.refreshHistory(ticker, exchange);
   }
 
+  refreshInfo(ticker: string, exchange: string) {
+    this.dataStore.refreshInfo(ticker, exchange);
+  }
+
+
+  // *** Updating Chart Functions ***
+
   getChangePct() {
-    this.changePct.oneWeek = ((this.holding.price - this.holding.history[5].price) / this.holding.price) * 100;
-    this.changePct.oneMonth = ((this.holding.price - this.holding.history[20].price) / this.holding.price) * 100;
-    this.changePct.threeMonths = ((this.holding.price - this.holding.history[60].price) / this.holding.price) * 100;
-    this.changePct.sixMonths = ((this.holding.price - this.holding.history[125].price) / this.holding.price) * 100;
-    this.changePct.oneYear = ((this.holding.price - this.holding.history[250].price) / this.holding.price) * 100;
-    this.changePct.fiveYears = ((this.holding.price - this.holding.history[1250].price) / this.holding.price) * 100;
+    this.changePct.oneWeek = Number(((this.holding.price - this.holding.history[5].price) / this.holding.price) * 100);
+    this.changePct.oneMonth = Number(((this.holding.price - this.holding.history[20].price) / this.holding.price) * 100);
+    this.changePct.sixMonths = Number(((this.holding.price - this.holding.history[125].price) / this.holding.price) * 100);
+    this.changePct.oneYear = Number(((this.holding.price - this.holding.history[250].price) / this.holding.price) * 100);
+    this.changePct.fiveYears = Number(((this.holding.price - this.holding.history[1250].price) / this.holding.price) * 100);
   }
 
   updateChart() {

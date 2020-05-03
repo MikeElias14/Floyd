@@ -2,6 +2,7 @@ import { MyHolding, MarketHolding, DatePrice } from './../models/holding.model';
 import { DataService } from './data.service';
 import { Injectable, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
+import { HoldingInfo } from '../models/holding-info.model';
 
 @Injectable()
 export class DataStore {
@@ -15,9 +16,14 @@ export class DataStore {
   marketHoldings$: Observable<Array<MarketHolding>>;
   marketHoldingsUpdated = new EventEmitter<Array<MarketHolding>>();
 
+  // TODO: These should not be arrays, need to figure out how to just get the hostory/info and add to holding
   historyLastUpdated = new Date();
   history$: Observable<Array<DatePrice>>;
   historyUpdated = new EventEmitter<Array<DatePrice>>();
+
+  infoLastUpdated = new Date();
+  info$: Observable<Array<HoldingInfo>>;
+  infoUpdated = new EventEmitter<Array<HoldingInfo>>();
 
   constructor(private dataService: DataService) {
     this.loadMyHoldings();
@@ -99,11 +105,8 @@ export class DataStore {
           i.gsx$name.$t.trim(),
           i.gsx$sector.$t.trim(),
           Number(i.gsx$price.$t.trim()),
-          Number(i.gsx$high52.$t.trim()),
-          Number(i.gsx$low52.$t.trim()),
           Number(i.gsx$changepct.$t.trim()),
-          Number(i.gsx$marketcap.$t.trim()),
-          []
+          Number(i.gsx$marketcap.$t.trim())
         )
       );
     }
@@ -145,6 +148,37 @@ export class DataStore {
     }
     return history;
   }
+
+  // Info
+  // TODO: Cash each one in the holding it belongs to
+
+  refreshInfo(ticker: string, exchange: string) {
+    this.loadInfo(ticker, exchange);
+    this.infoLastUpdated = new Date();
+  }
+
+  loadInfo(ticker: string, exchange: string) {
+    let info: Array<HoldingInfo>;
+    this.info$ = this.dataService.getInfo(ticker, exchange);
+    this.info$.subscribe(next => {
+      console.log(next);
+      if (next != null) {
+        info = this.transformInfo(next);
+      }
+
+      DataStore.setLocal(info, this.dataObjects.getCacheName('Info'));
+      this.infoUpdated.emit(info);
+    });
+  }
+
+  // TODO: There must be a better way for object -> interface
+  transformInfo(dataReceived: Array<any>): Array<HoldingInfo> {
+    const info: Array<HoldingInfo> = [new HoldingInfo()];
+    for (const [key, value] of Object.entries(dataReceived)) {
+      info[0][key] = value;
+    }
+    return info;
+  }
 }
 
 
@@ -152,7 +186,8 @@ export class DataObjects {
   dataObjects =  [
     {objName: 'MyHoldings', cache: 'myHoldingsCache', useYN: 'Y', labelName: 'MyHolding'},
     {objName: 'MarketHoldings', cache: 'marketHoldingsCache', useYN: 'Y', labelName: 'MarketHolding'},
-    {objName: 'History', cache: 'historyCashe', useYN: 'Y', labelName: 'History'}
+    {objName: 'History', cache: 'historyCashe', useYN: 'Y', labelName: 'History'},
+    {objName: 'Info', cache: 'infoCashe', useYN: 'Y', labelName: 'Info'}
   ];
 
   getCacheName(whichObj: string ): string {

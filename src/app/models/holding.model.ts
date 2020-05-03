@@ -1,3 +1,5 @@
+import { HoldingInfo } from './holding-info.model';
+
  // My Holding
 export class MyHolding implements IMyHolding {
   ticker: string;
@@ -37,24 +39,20 @@ export class MarketHolding implements IMarketHolding {
   name: string;
   sector: string;
   price: number;
-  high52: number;
-  low52: number;
   changepct: number;
   marketcap: number;
   history: Array<DatePrice>;
+  info: HoldingInfo;
 
   constructor(ticker: string, exchange: string, name: string, sector: string,
-              price: number, high52: number, low52: number, changepct: number, marketcap: number, history: Array<DatePrice>) {
+              price: number, changepct: number, marketcap: number) {
     this.ticker = ticker;
     this.exchange = exchange;
     this.name = name;
     this.sector = sector;
     this.price = price;
-    this.high52 = high52;
-    this.low52 = low52;
     this.changepct = changepct;
     this.marketcap = marketcap;
-    this.history = history;
   }
 }
 
@@ -64,12 +62,12 @@ export interface IMarketHolding {
   name: string;
   sector: string;
   price: number;
-  high52: number;
-  low52: number;
   changepct: number;
   marketcap: number;
   history: Array<DatePrice>;
+  info: HoldingInfo;
 }
+
 
 // Date Price
 export class DatePrice implements IDatePrice {

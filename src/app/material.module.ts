@@ -5,6 +5,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon'
 
 import { NgModule } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
@@ -22,7 +23,8 @@ import {CdkTreeModule} from '@angular/cdk/tree';
     MatToolbarModule,
     MatTabsModule,
     CdkTableModule,
-    CdkTreeModule
+    CdkTreeModule,
+    MatIconModule
   ],
   exports: [
     MatButtonModule,
@@ -34,7 +36,8 @@ import {CdkTreeModule} from '@angular/cdk/tree';
     MatToolbarModule,
     MatTabsModule,
     CdkTableModule,
-    CdkTreeModule
+    CdkTreeModule,
+    MatIconModule
   ]
 })
 export class MaterialModule { }
