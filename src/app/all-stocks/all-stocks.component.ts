@@ -1,4 +1,4 @@
-import { MarketHolding } from '../models/holding.model';
+import { Holding } from '../models/holding.model';
 import { DataStore } from '../stores/data.store';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
@@ -20,7 +20,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 })
 export class AllStocksComponent implements OnInit, AfterViewInit {
 
-  marketHoldings: MatTableDataSource<MarketHolding> = new MatTableDataSource<MarketHolding>();
+  marketHoldings: MatTableDataSource<Holding> = new MatTableDataSource<Holding>();
   marketData: any;
 
   holdingsObjName = 'MarketHoldings';

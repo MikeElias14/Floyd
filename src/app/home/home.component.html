@@ -25,22 +25,22 @@
         <td mat-cell *matCellDef="let record"> {{record.ticker}} </td>
       </ng-container>
 
-      <!-- numberShares Column -->
-      <ng-container matColumnDef="numberShares">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Number Shares</th>
-        <td mat-cell *matCellDef="let record"> {{record.numberShares}} </td>
+      <!-- owned Column -->
+      <ng-container matColumnDef="owned">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Owned</th>
+        <td mat-cell *matCellDef="let record"> {{record.owned}} </td>
       </ng-container>
 
-      <!-- sharePrice Column -->
-      <ng-container matColumnDef="sharePrice">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Share Price</th>
-        <td mat-cell *matCellDef="let record"> {{record.sharePrice}} </td>
+      <!-- price Column -->
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+        <td mat-cell *matCellDef="let record"> {{record.price}} </td>
       </ng-container>
 
       <!-- totalPrice Column -->
       <ng-container matColumnDef="totalPrice">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Price</th>
-        <td mat-cell *matCellDef="let record"> {{record.totalPrice}} </td>
+        <td mat-cell *matCellDef="let record"> {{record.price * record.owned | number}} </td>
       </ng-container>
 
       <!-- exchange Column -->

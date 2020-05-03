@@ -1,39 +1,6 @@
 import { HoldingInfo } from './holding-info.model';
 
- // My Holding
-export class MyHolding implements IMyHolding {
-  ticker: string;
-  exchange: string;
-  numberShares: number;
-  sharePrice: number;
-  totalPrice: number;
-  sector: string;
-  history: Array<DatePrice>;
-
-  constructor(ticker: string, exchange: string, numberShares: number,
-              sharePrice: number, totalPrice: number, sector: string, history: Array<DatePrice>) {
-    this.ticker = ticker;
-    this.exchange = exchange;
-    this.numberShares = numberShares;
-    this.sharePrice = sharePrice;
-    this.totalPrice = totalPrice;
-    this.sector = sector;
-    this.history = history;
-  }
-}
-
-export interface IMyHolding {
-  ticker: string;
-  exchange: string;
-  numberShares: number;
-  sharePrice: number;
-  totalPrice: number;
-  sector: string;
-  history: Array<DatePrice>;
-}
-
-// Market Holding
-export class MarketHolding implements IMarketHolding {
+export class Holding implements IHolding {
   ticker: string;
   exchange: string;
   name: string;
@@ -43,20 +10,22 @@ export class MarketHolding implements IMarketHolding {
   marketcap: number;
   history: Array<DatePrice>;
   info: HoldingInfo;
+  owned: number;
 
-  constructor(ticker: string, exchange: string, name: string, sector: string,
-              price: number, changepct: number, marketcap: number) {
+  constructor(ticker: string, exchange: string, sector: string,
+              price: number, changepct: number, marketcap: number, name?: string, owned?: number) {
     this.ticker = ticker;
     this.exchange = exchange;
-    this.name = name;
+    this.name = name || '';
     this.sector = sector;
     this.price = price;
     this.changepct = changepct;
     this.marketcap = marketcap;
+    this.owned = owned || 0;
   }
 }
 
-export interface IMarketHolding {
+export interface IHolding {
   ticker: string;
   exchange: string;
   name: string;
@@ -66,6 +35,7 @@ export interface IMarketHolding {
   marketcap: number;
   history: Array<DatePrice>;
   info: HoldingInfo;
+  owned: number;
 }
 
 

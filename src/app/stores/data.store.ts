@@ -1,4 +1,4 @@
-import { MyHolding, MarketHolding, DatePrice } from './../models/holding.model';
+import { Holding, DatePrice } from './../models/holding.model';
 import { DataService } from './data.service';
 import { Injectable, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -12,12 +12,12 @@ export class DataStore {
   historyCache = 'History';
 
   myLastUpdated = new Date();
-  myHoldings$: Observable<Array<MyHolding>>;
-  myHoldingsUpdated = new EventEmitter<Array<MyHolding>>();
+  myHoldings$: Observable<Array<Holding>>;
+  myHoldingsUpdated = new EventEmitter<Array<Holding>>();
 
   marketLastUpdated = new Date();
-  marketHoldings$: Observable<Array<MarketHolding>>;
-  marketHoldingsUpdated = new EventEmitter<Array<MarketHolding>>();
+  marketHoldings$: Observable<Array<Holding>>;
+  marketHoldingsUpdated = new EventEmitter<Array<Holding>>();
 
   historyLastUpdated = new Date();
   history$: Observable<Array<DatePrice>>;
@@ -52,37 +52,17 @@ export class DataStore {
   }
 
   loadMyHoldings() {
-    let holdings: Array<MyHolding> = [];
+    let holdings: Array<Holding> = [];
     this.myHoldings$ = this.dataService.getMyHoldings();
     this.myHoldings$.subscribe(next => {
       if (next != null) {
-        holdings = this.transformMyHoldings(next);
+        holdings = this.transformHoldings(next);
       }
 
       DataStore.setLocal(holdings, this.dataObjects.getCacheName('MyHoldings'));
       this.myHoldingsUpdated.emit(holdings);
     });
   }
-
-  transformMyHoldings(dataReceived: Array<any>): Array<MyHolding> {
-    const tempArray: Array<MyHolding> = [];
-
-    for (const i of dataReceived) {
-      tempArray.push(
-        new MyHolding (
-          i.gsx$ticker.$t.trim(),
-          i.gsx$exchange.$t.trim(),
-          Number(i.gsx$numbershares.$t.trim()),
-          Number(i.gsx$shareprice.$t.replace('$', '').trim()),
-          Number(i.gsx$totalprice.$t.replace('$', '').trim()),
-          i.gsx$sector.$t.trim(),
-          []
-        )
-      );
-    }
-    return tempArray;
-  }
-
 
   // *** Market Holdings ***
 
@@ -92,11 +72,11 @@ export class DataStore {
   }
 
   loadMarketHoldings() {
-    let holdings: Array<MarketHolding> = [];
+    let holdings: Array<Holding> = [];
     this.marketHoldings$ = this.dataService.getTSEHoldings();
     this.marketHoldings$.subscribe(next => {
       if (next != null) {
-        holdings = this.transformMarketHoldings(next);
+        holdings = this.transformHoldings(next);
       }
 
       DataStore.setLocal(holdings, this.dataObjects.getCacheName('MarketHoldings'));
@@ -104,19 +84,20 @@ export class DataStore {
     });
   }
 
-  transformMarketHoldings(dataReceived: Array<any>): Array<MarketHolding> {
-    const tempArray: Array<MarketHolding> = [];
+  transformHoldings(dataReceived: Array<any>): Array<Holding> {
+    const tempArray: Array<Holding> = [];
 
     for (const i of dataReceived) {
       tempArray.push(
-        new MarketHolding (
+        new Holding (
           i.gsx$ticker.$t.trim(),
           i.gsx$exchange.$t.trim(),
-          i.gsx$name.$t.trim(),
           i.gsx$sector.$t.trim(),
           Number(i.gsx$price.$t.trim()),
           Number(i.gsx$changepct.$t.trim()),
-          Number(i.gsx$marketcap.$t.trim())
+          Number(i.gsx$marketcap.$t.trim()),
+          i.gsx$name.$t.trim(),
+          Number(i.gsx$owned.$t.trim())
         )
       );
     }

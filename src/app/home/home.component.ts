@@ -1,4 +1,4 @@
-import { MyHolding } from '../models/holding.model';
+import { Holding } from '../models/holding.model';
 import { DataStore } from '../stores/data.store';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
@@ -12,7 +12,7 @@ import { MatSort } from '@angular/material/sort';
 })
 export class HomeComponent implements OnInit {
 
-  myHoldings = new MatTableDataSource<MyHolding>();
+  myHoldings = new MatTableDataSource<Holding>();
   holdingsObjName = 'MyHoldings';
 
   pieTickerData: number[] = [];
@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit {
     other: 0
   };
 
-  displayedColumns: string[] = ['ticker', 'numberShares', 'sharePrice', 'totalPrice', 'exchange', 'sector'];
+  displayedColumns: string[] = ['ticker', 'owned', 'price', 'totalPrice', 'exchange', 'sector'];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   mpPageSizeOptions: number[] = [10, 25, 100];
@@ -85,15 +85,15 @@ export class HomeComponent implements OnInit {
   calcTotalValues() {
     this.resetTotals();
     this.myHoldings.data.forEach(holding => {
-      this.totalValues.total += holding.totalPrice;
-      this.totalValues[holding.sector] += holding.totalPrice;
+      this.totalValues.total += holding.price * holding.owned;
+      this.totalValues[holding.sector] += holding.price * holding.owned;
     });
   }
 
   updateCharts() {
     this.resetChartData();
     this.myHoldings.data.forEach(holding => {
-      this.pieTickerData.push(holding.totalPrice);
+      this.pieTickerData.push(Number(holding.price * holding.owned));
       this.pieTickerLabels.push(holding.ticker);
     });
 
