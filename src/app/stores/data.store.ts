@@ -8,6 +8,9 @@ import { HoldingInfo } from '../models/holding-info.model';
 export class DataStore {
   dataObjects = new DataObjects();
 
+  infoCache = 'Info';
+  historyCache = 'History';
+
   myLastUpdated = new Date();
   myHoldings$: Observable<Array<MyHolding>>;
   myHoldingsUpdated = new EventEmitter<Array<MyHolding>>();
@@ -16,16 +19,18 @@ export class DataStore {
   marketHoldings$: Observable<Array<MarketHolding>>;
   marketHoldingsUpdated = new EventEmitter<Array<MarketHolding>>();
 
-  // TODO: These should not be arrays, need to figure out how to just get the hostory/info and add to holding
   historyLastUpdated = new Date();
   history$: Observable<Array<DatePrice>>;
   historyUpdated = new EventEmitter<Array<DatePrice>>();
 
   infoLastUpdated = new Date();
-  info$: Observable<Array<HoldingInfo>>;
-  infoUpdated = new EventEmitter<Array<HoldingInfo>>();
+  info$: Observable<HoldingInfo>;
+  infoUpdated = new EventEmitter<HoldingInfo>();
 
   constructor(private dataService: DataService) {
+    DataStore.setLocal([], this.infoCache);
+    DataStore.setLocal([], this.historyCache);
+
     this.loadMyHoldings();
     this.loadMarketHoldings();
   }
@@ -34,7 +39,12 @@ export class DataStore {
     localStorage[cacheName] = JSON.stringify(whatData);
   }
 
-  // My Holdings
+  public static getLocal(cacheName: string) {
+    return  JSON.parse(localStorage[cacheName]);
+  }
+
+
+  // *** My Holdings ***
 
   refreshMyData() {
     this.loadMyHoldings();
@@ -74,7 +84,7 @@ export class DataStore {
   }
 
 
-  // Market Holdings
+  // *** Market Holdings ***
 
   refreshMarketData() {
     this.loadMarketHoldings();
@@ -114,8 +124,7 @@ export class DataStore {
   }
 
 
-  // History
-  // TODO: Cash each one in the holding it belongs to
+  // *** History ***
 
   refreshHistory(ticker: string, exchange: string) {
     this.loadHistory(ticker, exchange);
@@ -130,7 +139,11 @@ export class DataStore {
         history = this.transformHistory(next);
       }
 
-      DataStore.setLocal(history, this.dataObjects.getCacheName('History'));
+      const histroyObj = DataStore.getLocal(this.historyCache);
+      const index = histroyObj.findIndex(myObj => myObj.ticker === ticker);
+      (index === -1) ? histroyObj.push({ticker: `${ticker}`, history: history}) :  histroyObj[index].history = history;
+
+      DataStore.setLocal(histroyObj, this.historyCache);
       this.historyUpdated.emit(history);
     });
   }
@@ -149,8 +162,8 @@ export class DataStore {
     return history;
   }
 
-  // Info
-  // TODO: Cash each one in the holding it belongs to
+
+  // *** Info ***
 
   refreshInfo(ticker: string, exchange: string) {
     this.loadInfo(ticker, exchange);
@@ -158,24 +171,27 @@ export class DataStore {
   }
 
   loadInfo(ticker: string, exchange: string) {
-    let info: Array<HoldingInfo>;
+    let info: HoldingInfo;
     this.info$ = this.dataService.getInfo(ticker, exchange);
     this.info$.subscribe(next => {
-      console.log(next);
+
       if (next != null) {
         info = this.transformInfo(next);
       }
 
-      DataStore.setLocal(info, this.dataObjects.getCacheName('Info'));
+      const infoObj = DataStore.getLocal(this.infoCache);
+      const index = infoObj.findIndex(myObj => myObj.ticker === ticker);
+      (index === -1) ? infoObj.push({ticker: `${ticker}`, info: info}) :  infoObj[index].info = info;
+
+      DataStore.setLocal(infoObj, this.infoCache);
       this.infoUpdated.emit(info);
     });
   }
 
-  // TODO: There must be a better way for object -> interface
-  transformInfo(dataReceived: Array<any>): Array<HoldingInfo> {
-    const info: Array<HoldingInfo> = [new HoldingInfo()];
+  transformInfo(dataReceived: any): HoldingInfo {
+    const info = new HoldingInfo();
     for (const [key, value] of Object.entries(dataReceived)) {
-      info[0][key] = value;
+      info[key] = value; // TODO: There must be a better way for object -> interface
     }
     return info;
   }
@@ -185,9 +201,7 @@ export class DataStore {
 export class DataObjects {
   dataObjects =  [
     {objName: 'MyHoldings', cache: 'myHoldingsCache', useYN: 'Y', labelName: 'MyHolding'},
-    {objName: 'MarketHoldings', cache: 'marketHoldingsCache', useYN: 'Y', labelName: 'MarketHolding'},
-    {objName: 'History', cache: 'historyCashe', useYN: 'Y', labelName: 'History'},
-    {objName: 'Info', cache: 'infoCashe', useYN: 'Y', labelName: 'Info'}
+    {objName: 'MarketHoldings', cache: 'marketHoldingsCache', useYN: 'Y', labelName: 'MarketHolding'}
   ];
 
   getCacheName(whichObj: string ): string {

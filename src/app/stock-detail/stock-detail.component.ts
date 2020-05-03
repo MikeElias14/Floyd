@@ -11,14 +11,18 @@ export class StockDetailComponent implements OnInit {
   // TODO: This should be passed by ref so that I can update the holding with info and hostory
   // Then, check if it is there before getting it again.
   @Input()
-  holding: any;
+  holding: any;  // I think I only need the ticker if I am doing all this in 'infoCache' objects
+
+  infoObj: Array<any>;
+  historyObj: Array<any>;
 
   lineDataset: Array<ChartDataSets> = [];
   lineLabels: Array<string> = [];
   chartDays = 250; // Default one year
 
-  historyObjName = 'History';
-  infoObjName = 'Info';
+  // TODO: These should be in config globably
+  historyCache = 'History';
+  infoCache = 'Info';
 
   changePct = {
     oneWeek: 0,
@@ -26,10 +30,10 @@ export class StockDetailComponent implements OnInit {
     sixMonths: 0,
     oneYear: 0,
     fiveYears: 0
-  }
+  };
 
   constructor(public dataStore: DataStore) {
-    // Get History ( TODO: if not already there for holding)
+    // Subscribe History
     this.dataStore.historyUpdated.subscribe(
       (newData: any) => {
         this.holding.history = newData;
@@ -39,23 +43,40 @@ export class StockDetailComponent implements OnInit {
       }
     );
 
-    // Get Info ( TODO: if not already there for holding)
+    // Subscribe Info
     this.dataStore.infoUpdated.subscribe(
       (newData: any) => {
-        this.holding.info = newData[0];
+        this.holding.info = newData;
       }
     );
   }
 
+  // Check if we need to fetch new data or we can use cashed data
   ngOnInit() {
-    this.dataStore.marketHoldingsUpdated.emit(
-      // use the local storage if there until HTTP call retrieves something
-      JSON.parse(localStorage[this.dataStore.dataObjects.getCacheName(this.historyObjName)] || '[]')
-    );
 
-    this.refreshHistory(this.holding.ticker, this.holding.exchange);
-    this.refreshInfo(this.holding.ticker, this.holding.exchange);
+    // History
+    this.historyObj = JSON.parse(localStorage[this.historyCache]);
+    const historyIndex = this.historyObj.findIndex(myObj => myObj.ticker === this.holding.ticker);
+
+    if (historyIndex === -1) {
+      this.refreshHistory(this.holding.ticker, this.holding.exchange);
+    } else {
+      this.holding.history = this.historyObj[historyIndex].history;
+      this.updateChart();
+      this.getChangePct();
+    }
+
+    // Info
+    this.infoObj = JSON.parse(localStorage[this.infoCache]);
+    const infoIndex = this.infoObj.findIndex(myObj => myObj.ticker === this.holding.ticker);
+
+    if (infoIndex === -1) {
+      this.refreshInfo(this.holding.ticker, this.holding.exchange);
+    } else {
+      this.holding.info = this.infoObj[infoIndex].info;
+    }
   }
+
 
   // *** Get Data Functions ***
 
