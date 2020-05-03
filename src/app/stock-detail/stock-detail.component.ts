@@ -8,10 +8,9 @@ import { ChartDataSets } from 'chart.js';
   styleUrls: ['./stock-detail.component.scss']
 })
 export class StockDetailComponent implements OnInit {
-  // TODO: This should be passed by ref so that I can update the holding with info and hostory
-  // Then, check if it is there before getting it again.
+
   @Input()
-  holding: any;  // I think I only need the ticker if I am doing all this in 'infoCache' objects
+  holding: any;
 
   infoObj: Array<any>;
   historyObj: Array<any>;
@@ -58,7 +57,7 @@ export class StockDetailComponent implements OnInit {
     this.historyObj = JSON.parse(localStorage[this.historyCache]);
     const historyIndex = this.historyObj.findIndex(myObj => myObj.ticker === this.holding.ticker);
 
-    if (historyIndex === -1) {
+    if (historyIndex < 0) {
       this.refreshHistory(this.holding.ticker, this.holding.exchange);
     } else {
       this.holding.history = this.historyObj[historyIndex].history;
@@ -70,7 +69,7 @@ export class StockDetailComponent implements OnInit {
     this.infoObj = JSON.parse(localStorage[this.infoCache]);
     const infoIndex = this.infoObj.findIndex(myObj => myObj.ticker === this.holding.ticker);
 
-    if (infoIndex === -1) {
+    if (infoIndex < 0) {
       this.refreshInfo(this.holding.ticker, this.holding.exchange);
     } else {
       this.holding.info = this.infoObj[infoIndex].info;
@@ -90,13 +89,22 @@ export class StockDetailComponent implements OnInit {
 
 
   // *** Updating Chart Functions ***
-
+  // TODO: Use for instead of all these ifs
   getChangePct() {
     this.changePct.oneWeek = Number(((this.holding.price - this.holding.history[5].price) / this.holding.price) * 100);
     this.changePct.oneMonth = Number(((this.holding.price - this.holding.history[20].price) / this.holding.price) * 100);
-    this.changePct.sixMonths = Number(((this.holding.price - this.holding.history[125].price) / this.holding.price) * 100);
-    this.changePct.oneYear = Number(((this.holding.price - this.holding.history[250].price) / this.holding.price) * 100);
-    this.changePct.fiveYears = Number(((this.holding.price - this.holding.history[1250].price) / this.holding.price) * 100);
+
+    if (this.holding.history.length > 250) {
+      this.changePct.sixMonths = Number(((this.holding.price - this.holding.history[125].price) / this.holding.price) * 100);
+    }
+
+    if (this.holding.history.length > 250) {
+      this.changePct.oneYear = Number(((this.holding.price - this.holding.history[250].price) / this.holding.price) * 100);
+    }
+
+    if (this.holding.history.length > 1250) {
+      this.changePct.fiveYears = Number(((this.holding.price - this.holding.history[1250].price) / this.holding.price) * 100);
+    }
   }
 
   updateChart() {
