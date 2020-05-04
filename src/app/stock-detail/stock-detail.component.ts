@@ -1,6 +1,8 @@
+import { AppConfig } from './../app.config';
 import { DataStore } from './../stores/data.store';
 import { Component, OnInit, Input } from '@angular/core';
 import { ChartDataSets } from 'chart.js';
+import { IDatePrice } from '../models/holding.model';
 
 @Component({
   selector: 'app-stock-detail',
@@ -12,16 +14,12 @@ export class StockDetailComponent implements OnInit {
   @Input()
   holding: any;
 
-  infoObj: Array<any>;
-  historyObj: Array<any>;
+  infoObj: Array<{ticker: string, info: Array<IDatePrice>}>;
+  historyObj: Array<{ticker: string, history: Array<IDatePrice>}>;
 
   lineDataset: Array<ChartDataSets> = [];
   lineLabels: Array<string> = [];
   chartDays = 250; // Default one year
-
-  // TODO: These should be in config globably
-  historyCache = 'History';
-  infoCache = 'Info';
 
   changePct = {
     oneWeek: 0,
@@ -35,7 +33,7 @@ export class StockDetailComponent implements OnInit {
     // Subscribe History
     this.dataStore.historyUpdated.subscribe(
       (newData: any) => {
-        this.holding.history = newData;
+        this.holding.history = newData.history;
 
         this.updateChart();
         this.setChangePct();
@@ -45,7 +43,7 @@ export class StockDetailComponent implements OnInit {
     // Subscribe Info
     this.dataStore.infoUpdated.subscribe(
       (newData: any) => {
-        this.holding.info = newData;
+        this.holding.info = newData.info;
       }
     );
   }
@@ -54,7 +52,7 @@ export class StockDetailComponent implements OnInit {
   ngOnInit() {
 
     // History
-    this.historyObj = JSON.parse(localStorage[this.historyCache]);
+    this.historyObj = JSON.parse(localStorage[AppConfig.settings.historyCache]);
     const historyIndex = this.historyObj.findIndex(myObj => myObj.ticker === this.holding.ticker);
 
     if (historyIndex < 0) {
@@ -66,7 +64,7 @@ export class StockDetailComponent implements OnInit {
     }
 
     // Info
-    this.infoObj = JSON.parse(localStorage[this.infoCache]);
+    this.infoObj = JSON.parse(localStorage[AppConfig.settings.infoCache]);
     const infoIndex = this.infoObj.findIndex(myObj => myObj.ticker === this.holding.ticker);
 
     if (infoIndex < 0) {

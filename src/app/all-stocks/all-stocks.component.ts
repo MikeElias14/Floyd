@@ -1,3 +1,4 @@
+import { AppConfig } from './../app.config';
 import { Holding } from '../models/holding.model';
 import { DataStore } from '../stores/data.store';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
@@ -23,8 +24,6 @@ export class AllStocksComponent implements OnInit, AfterViewInit {
   marketHoldings: MatTableDataSource<Holding> = new MatTableDataSource<Holding>();
   marketData: any;
 
-  holdingsObjName = 'MarketHoldings';
-
   displayedColumns: string[] = ['ticker', 'name', 'price',  'changePrice', 'changepct', 'marketcap', 'exchange', 'sector'];
 
   @ViewChild(MatSort) sort: MatSort;
@@ -45,7 +44,7 @@ export class AllStocksComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.dataStore.marketHoldingsUpdated.emit(
       // use the local storage if there until HTTP call retrieves something
-      JSON.parse(localStorage[this.dataStore.dataObjects.getCacheName(this.holdingsObjName)] || '[]')
+      JSON.parse(localStorage[AppConfig.settings.marketHoldingsCache] || '[]')
     );
   }
 

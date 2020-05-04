@@ -5,10 +5,11 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon'
+import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { NgModule } from '@angular/core';
-import { MatTableModule } from '@angular/material/table';
 import {CdkTableModule} from '@angular/cdk/table';
 import {CdkTreeModule} from '@angular/cdk/tree';
 
@@ -24,7 +25,8 @@ import {CdkTreeModule} from '@angular/cdk/tree';
     MatTabsModule,
     CdkTableModule,
     CdkTreeModule,
-    MatIconModule
+    MatIconModule,
+    MatCheckboxModule
   ],
   exports: [
     MatButtonModule,
@@ -37,7 +39,8 @@ import {CdkTreeModule} from '@angular/cdk/tree';
     MatTabsModule,
     CdkTableModule,
     CdkTreeModule,
-    MatIconModule
+    MatIconModule,
+    MatCheckboxModule
   ]
 })
 export class MaterialModule { }

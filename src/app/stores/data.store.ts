@@ -1,3 +1,4 @@
+import { AppConfig } from './../app.config';
 import { Holding, IDatePrice } from './../models/holding.model';
 import { DataService } from './data.service';
 import { Injectable, EventEmitter } from '@angular/core';
@@ -6,10 +7,6 @@ import { IHoldingInfo } from '../models/holding-info.model';
 
 @Injectable()
 export class DataStore {
-  dataObjects = new DataObjects();
-
-  infoCache = 'Info';
-  historyCache = 'History';
 
   myLastUpdated = new Date();
   myHoldings$: Observable<Array<Holding>>;
@@ -21,15 +18,15 @@ export class DataStore {
 
   historyLastUpdated = new Date();
   history$: Observable<Array<IDatePrice>>;
-  historyUpdated = new EventEmitter<Array<IDatePrice>>();
+  historyUpdated = new EventEmitter<{ticker: string, history: Array<IDatePrice>}>();
 
   infoLastUpdated = new Date();
   info$: Observable<IHoldingInfo>;
-  infoUpdated = new EventEmitter<IHoldingInfo>();
+  infoUpdated = new EventEmitter<{ticker: string, info: IHoldingInfo}>();
 
   constructor(private dataService: DataService) {
-    DataStore.setLocal([], this.infoCache);
-    DataStore.setLocal([], this.historyCache);
+    DataStore.setLocal([], AppConfig.settings.infoCache);
+    DataStore.setLocal([], AppConfig.settings.historyCache);
 
     this.loadMyHoldings();
     this.loadMarketHoldings();
@@ -59,7 +56,7 @@ export class DataStore {
         holdings = this.transformHoldings(next);
       }
 
-      DataStore.setLocal(holdings, this.dataObjects.getCacheName('MyHoldings'));
+      DataStore.setLocal(holdings, AppConfig.settings.myHoldingsCache);
       this.myHoldingsUpdated.emit(holdings);
     });
   }
@@ -79,7 +76,7 @@ export class DataStore {
         holdings = this.transformHoldings(next);
       }
 
-      DataStore.setLocal(holdings, this.dataObjects.getCacheName('MarketHoldings'));
+      DataStore.setLocal(holdings, AppConfig.settings.marketHoldingsCache);
       this.marketHoldingsUpdated.emit(holdings);
     });
   }
@@ -126,12 +123,12 @@ export class DataStore {
         history = this.transformHistory(next);
       }
 
-      const histroyObj = DataStore.getLocal(this.historyCache);
+      const histroyObj = DataStore.getLocal(AppConfig.settings.historyCache);
       const index = histroyObj.findIndex(myObj => myObj.ticker === ticker);
       (index === -1) ? histroyObj.push({ticker: `${ticker}`, history: history}) :  histroyObj[index].history = history;
 
-      DataStore.setLocal(histroyObj, this.historyCache);
-      this.historyUpdated.emit(history);
+      DataStore.setLocal(histroyObj, AppConfig.settings.historyCache);
+      this.historyUpdated.emit({ticker: `${ticker}`, history: history});
     });
   }
 
@@ -165,32 +162,17 @@ export class DataStore {
         info = this.transformInfo(next);
       }
 
-      const infoObj = DataStore.getLocal(this.infoCache);
+      const infoObj = DataStore.getLocal(AppConfig.settings.infoCache);
       const index = infoObj.findIndex(myObj => myObj.ticker === ticker);
       (index === -1) ? infoObj.push({ticker: `${ticker}`, info: info}) :  infoObj[index].info = info;
 
-      DataStore.setLocal(infoObj, this.infoCache);
-      this.infoUpdated.emit(info);
+      DataStore.setLocal(infoObj, AppConfig.settings.infoCache);
+      this.infoUpdated.emit({ticker: `${ticker}`, info: info});
     });
   }
 
   transformInfo(dataReceived: any): IHoldingInfo {
     const info = dataReceived as IHoldingInfo;
     return info;
-  }
-}
-
-
-export class DataObjects {
-  dataObjects =  [
-    {objName: 'MyHoldings', cache: 'myHoldingsCache', useYN: 'Y', labelName: 'MyHolding'},
-    {objName: 'MarketHoldings', cache: 'marketHoldingsCache', useYN: 'Y', labelName: 'MarketHolding'}
-  ];
-
-  getCacheName(whichObj: string ): string {
-    return this.dataObjects.find(myObj => myObj.objName === whichObj).cache;
-  }
-  getLabelName(whichObj: string ): string {
-    return this.dataObjects.find(myObj => myObj.objName === whichObj).labelName;
   }
 }
