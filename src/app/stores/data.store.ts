@@ -1,8 +1,8 @@
-import { Holding, DatePrice } from './../models/holding.model';
+import { Holding, IDatePrice } from './../models/holding.model';
 import { DataService } from './data.service';
 import { Injectable, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HoldingInfo } from '../models/holding-info.model';
+import { IHoldingInfo } from '../models/holding-info.model';
 
 @Injectable()
 export class DataStore {
@@ -20,12 +20,12 @@ export class DataStore {
   marketHoldingsUpdated = new EventEmitter<Array<Holding>>();
 
   historyLastUpdated = new Date();
-  history$: Observable<Array<DatePrice>>;
-  historyUpdated = new EventEmitter<Array<DatePrice>>();
+  history$: Observable<Array<IDatePrice>>;
+  historyUpdated = new EventEmitter<Array<IDatePrice>>();
 
   infoLastUpdated = new Date();
-  info$: Observable<HoldingInfo>;
-  infoUpdated = new EventEmitter<HoldingInfo>();
+  info$: Observable<IHoldingInfo>;
+  infoUpdated = new EventEmitter<IHoldingInfo>();
 
   constructor(private dataService: DataService) {
     DataStore.setLocal([], this.infoCache);
@@ -88,6 +88,12 @@ export class DataStore {
     const tempArray: Array<Holding> = [];
 
     for (const i of dataReceived) {
+      let name: string;
+      let owned: number;
+
+      ('gsx$name' in i ) ? name = i.gsx$name.$t.trim() : name = '';
+      ('gsx$owned' in i ) ? owned = Number(i.gsx$owned.$t.trim()) : owned = 0;
+
       tempArray.push(
         new Holding (
           i.gsx$ticker.$t.trim(),
@@ -96,8 +102,8 @@ export class DataStore {
           Number(i.gsx$price.$t.trim()),
           Number(i.gsx$changepct.$t.trim()),
           Number(i.gsx$marketcap.$t.trim()),
-          i.gsx$name.$t.trim(),
-          Number(i.gsx$owned.$t.trim())
+          name = name,
+          owned = owned
         )
       );
     }
@@ -113,7 +119,7 @@ export class DataStore {
   }
 
   loadHistory(ticker: string, exchange: string) {
-    let history: Array<DatePrice> = [];
+    let history: Array<IDatePrice> = [];
     this.history$ = this.dataService.getHistory(ticker, exchange);
     this.history$.subscribe(next => {
       if (next != null) {
@@ -129,17 +135,16 @@ export class DataStore {
     });
   }
 
-  transformHistory(dataReceived: Array<any>): Array<DatePrice> {
-    const history: Array<DatePrice> = [];
+  transformHistory(dataReceived: Array<any>): Array<IDatePrice> {
+    const history: Array<IDatePrice> = [];
 
-    for (const [date, price] of Object.entries(dataReceived['Time Series (Daily)'])) {
-      history.push(
-        new DatePrice (
-          Number(price['4. close']),
-          String(date)
-        )
-      );
-    }
+    dataReceived.forEach(obj => {
+      history.push({
+        price: Number(Object.values(obj)[0]),
+        date: Object.keys(obj)[0]
+      });
+    });
+
     return history;
   }
 
@@ -152,7 +157,7 @@ export class DataStore {
   }
 
   loadInfo(ticker: string, exchange: string) {
-    let info: HoldingInfo;
+    let info: IHoldingInfo;
     this.info$ = this.dataService.getInfo(ticker, exchange);
     this.info$.subscribe(next => {
 
@@ -169,11 +174,8 @@ export class DataStore {
     });
   }
 
-  transformInfo(dataReceived: any): HoldingInfo {
-    const info = new HoldingInfo();
-    for (const [key, value] of Object.entries(dataReceived)) {
-      info[key] = value; // TODO: There must be a better way for object -> interface
-    }
+  transformInfo(dataReceived: any): IHoldingInfo {
+    const info = dataReceived as IHoldingInfo;
     return info;
   }
 }

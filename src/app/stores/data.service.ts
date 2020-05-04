@@ -8,8 +8,6 @@ import { catchError, map } from 'rxjs/operators';
 export class DataService {
   protected myHoldingsUrl = AppConfig.settings.my_holdings_sheet_url;
   protected tseHoldingsUrl = AppConfig.settings.market_holdings_sheet_url;
-  protected alphaKey = AppConfig.settings.alpha_api_keys[0];
-  protected alphaHoldingUrl = AppConfig.settings.alpha_url;
   protected floydApiUrl =  AppConfig.settings.floyd_api_url;
 
 
@@ -50,13 +48,13 @@ export class DataService {
     let symbol: string;
 
     if (exchange === 'TSE') {
-      symbol = `TSX:${ticker}`;
+      symbol = `${ticker}.TO`;
     } else {
       symbol = ticker;
     }
 
     const res = this.httpClient.get<any>(
-      `${this.alphaHoldingUrl}/query?function=TIME_SERIES_DAILY&symbol=${symbol}&outputsize=full&apikey=${this.alphaKey}`).pipe(
+      `${this.floydApiUrl}/holding/history?ticker=${symbol}`).pipe(
       map(obj => obj),
       catchError(this.handleError())
     );

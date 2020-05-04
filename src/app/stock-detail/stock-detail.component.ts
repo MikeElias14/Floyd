@@ -38,7 +38,7 @@ export class StockDetailComponent implements OnInit {
         this.holding.history = newData;
 
         this.updateChart();
-        this.getChangePct();
+        this.setChangePct();
       }
     );
 
@@ -62,7 +62,7 @@ export class StockDetailComponent implements OnInit {
     } else {
       this.holding.history = this.historyObj[historyIndex].history;
       this.updateChart();
-      this.getChangePct();
+      this.setChangePct();
     }
 
     // Info
@@ -90,21 +90,30 @@ export class StockDetailComponent implements OnInit {
 
   // *** Updating Chart Functions ***
   // TODO: Use for instead of all these ifs
-  getChangePct() {
-    this.changePct.oneWeek = Number(((this.holding.price - this.holding.history[5].price) / this.holding.price) * 100);
-    this.changePct.oneMonth = Number(((this.holding.price - this.holding.history[20].price) / this.holding.price) * 100);
+  setChangePct() {
+    this.changePct.oneWeek = this.calcChangePct(5);
+    this.changePct.oneMonth = this.calcChangePct(20);
 
-    if (this.holding.history.length > 250) {
-      this.changePct.sixMonths = Number(((this.holding.price - this.holding.history[125].price) / this.holding.price) * 100);
+    if (this.holding.history.length > 125) {
+      this.changePct.sixMonths = this.calcChangePct(125);
     }
 
     if (this.holding.history.length > 250) {
-      this.changePct.oneYear = Number(((this.holding.price - this.holding.history[250].price) / this.holding.price) * 100);
+      this.changePct.oneYear = this.calcChangePct(250);
+    } else {
+      this.changePct.fiveYears = this.calcChangePct(0);
     }
 
     if (this.holding.history.length > 1250) {
-      this.changePct.fiveYears = Number(((this.holding.price - this.holding.history[1250].price) / this.holding.price) * 100);
+      this.changePct.fiveYears = this.calcChangePct(1250);
+    } else {
+      this.changePct.fiveYears = this.calcChangePct(0);
     }
+  }
+
+  calcChangePct(day) {
+    if (day === 0 ) { day = this.holding.history.length; }
+    return Number(((this.holding.price - this.holding.history[this.holding.history.length - day].price) / this.holding.price) * 100);
   }
 
   updateChart() {
@@ -116,13 +125,10 @@ export class StockDetailComponent implements OnInit {
       this.lineLabels.push(String(element.date));
     });
 
-    if (this.chartDays !== 0) {
-      prices = prices.slice(0, this.chartDays);
-      this.lineLabels = this.lineLabels.slice(0, this.chartDays);
+    if (this.chartDays !== 0 && this.chartDays < prices.length) {
+      prices = prices.slice(prices.length - this.chartDays);
+      this.lineLabels = this.lineLabels.slice(this.lineLabels.length - this.chartDays);
     }
-
-    prices.reverse();
-    this.lineLabels.reverse();
 
     this.lineDataset.push({
       data: prices,

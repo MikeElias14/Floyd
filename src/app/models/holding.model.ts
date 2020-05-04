@@ -1,4 +1,4 @@
-import { HoldingInfo } from './holding-info.model';
+import { IHoldingInfo } from './holding-info.model';
 
 export class Holding implements IHolding {
   ticker: string;
@@ -8,8 +8,8 @@ export class Holding implements IHolding {
   price: number;
   changepct: number;
   marketcap: number;
-  history: Array<DatePrice>;
-  info: HoldingInfo;
+  history: Array<IDatePrice>;
+  info: IHoldingInfo;
   owned: number;
 
   constructor(ticker: string, exchange: string, sector: string,
@@ -33,22 +33,11 @@ export interface IHolding {
   price: number;
   changepct: number;
   marketcap: number;
-  history: Array<DatePrice>;
-  info: HoldingInfo;
+  history: Array<IDatePrice>;
+  info: IHoldingInfo;
   owned: number;
 }
 
-
-// Date Price
-export class DatePrice implements IDatePrice {
-  price: number;
-  date: string;
-
-  constructor(  price: number, date: string) {
-    this.price =  price;
-    this.date =  date;
-  }
-}
 
 export interface IDatePrice {
   price: number;
