@@ -1,5 +1,5 @@
 import { ChartDataSets } from 'chart.js';
-import { IHoldingInfo } from './../models/holding-info.model';
+import { IHoldingInfo } from '../models/info.model';
 import { AppConfig } from './../app.config';
 import { Holding, IDatePrice } from '../models/holding.model';
 import { DataStore } from '../stores/data.store';
@@ -21,7 +21,7 @@ export class HomeComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   mpPageSizeOptions: number[] = [10, 25, 100];
   pageEvent: PageEvent;
-
+  // TODO: sorting broken
   @ViewChild(MatSort) sort: MatSort;
 
   // For detail view I will move to its own compoent once I get it working here

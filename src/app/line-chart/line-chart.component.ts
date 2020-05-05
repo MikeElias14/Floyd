@@ -8,6 +8,7 @@ import { ChartOptions, ChartDataSets } from 'chart.js';
 })
 export class LineChartComponent {
 
+  @Input()
   options: ChartOptions = {
     responsive: true,
     elements: {
