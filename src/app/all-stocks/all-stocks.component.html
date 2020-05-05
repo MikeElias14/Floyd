@@ -1,70 +1,75 @@
-<div>
-
-  <mat-form-field>
+<div class="center">
+  <mat-form-field class="left">
     <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
   </mat-form-field>
   
-  <button class="mat-stroked-button" (click)="refreshMarketHoldings()">Refresh Holdings</button>
+  <button class="mat-stroked-button" (click)="refreshMarketHoldings()">Refresh</button>
 
-  <mat-paginator 
+  <mat-paginator class="right"
     [pageSizeOptions]="mpPageSizeOptions"
     (page)="pageEvent = $event">
   </mat-paginator> 
+</div>
 
-  <table mat-table [dataSource]="marketHoldings" class="mat-elevation-z8"
-      matSort matSortActive="created"
+<div>
+  <table mat-table [dataSource]="marketHoldings" class="center mat-elevation-z8"
+      matSort matSortActive="marketcap"
       matSortDisableClear
-      matSortDirection="asc">
+      matSortDirection="desc">
 
     <!-- ticker Column -->
     <ng-container matColumnDef="ticker">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Ticker</th>
-      <td mat-cell *matCellDef="let record"> {{record.ticker}} </td>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Ticker</mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.ticker}} </mat-cell>
     </ng-container>
 
     <!-- name Column -->
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-      <td mat-cell *matCellDef="let record"> {{record.name}} </td>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
     </ng-container>
 
     <!-- price Column -->
     <ng-container matColumnDef="price">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
-      <td mat-cell *matCellDef="let record"> {{record.price}} </td>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Price</mat-header-cell>
+      <mat-cell *matCellDef="let element"> ${{element.price| number }} </mat-cell>
     </ng-container>
 
-    <!-- high52 Column -->
-    <ng-container matColumnDef="high52">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>52-week High</th>
-      <td mat-cell *matCellDef="let record"> {{record.high52}} </td>
+    <!-- changePrice Column -->
+    <ng-container matColumnDef="changePrice">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Change ($)</mat-header-cell>
+      <mat-cell *matCellDef="let element"
+        [class.positive]= "element.changepct >= 0"
+        [class.negative]= "element.changepct < 0"
+      > ${{ element.price - (element.price / (1+element.changepct/100)) | number}}</mat-cell>
     </ng-container>
 
-    <!-- low52 Column -->
-    <ng-container matColumnDef="low52">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>52-week Low</th>
-      <td mat-cell *matCellDef="let record"> {{record.low52}} </td>
+    <!-- changepct Column -->
+    <ng-container matColumnDef="changepct">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Change (%)</mat-header-cell>
+      <mat-cell *matCellDef="let element"
+        [class.positive]= "element.changepct >= 0"
+        [class.negative]= "element.changepct < 0"
+      > {{element.changepct | number}}%</mat-cell>
     </ng-container>
 
     <!-- marketcap Column -->
     <ng-container matColumnDef="marketcap">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Market Cap</th>
-      <td mat-cell *matCellDef="let record"> {{record.marketcap}} </td>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Market Cap</mat-header-cell>
+      <mat-cell *matCellDef="let element"> ${{element.marketcap | number}} </mat-cell>
     </ng-container>
 
     <!-- exchange Column -->
     <ng-container matColumnDef="exchange">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Exchange</th>
-      <td mat-cell *matCellDef="let record"> {{record.exchange}} </td>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Exchange</mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.exchange}} </mat-cell>
     </ng-container>
 
     <!-- sector Column -->
     <ng-container matColumnDef="sector">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Sector</th>
-      <td mat-cell *matCellDef="let record"> {{record.sector}} </td>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Sector</mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.sector}} </mat-cell>
     </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table> 
+	</table>
 </div>

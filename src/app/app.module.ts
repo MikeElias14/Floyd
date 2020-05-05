@@ -13,6 +13,7 @@ import { DataService } from './stores/data.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HomeComponent } from './home/home.component';
 import { AllStocksComponent } from './all-stocks/all-stocks.component';
+import { LineChartComponent } from './line-chart/line-chart.component';
 
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();
@@ -23,7 +24,8 @@ export function initializeApp(appConfig: AppConfig) {
     AppComponent,
     PieChartComponent,
     HomeComponent,
-    AllStocksComponent
+    AllStocksComponent,
+    LineChartComponent
   ],
   imports: [
     BrowserModule,
