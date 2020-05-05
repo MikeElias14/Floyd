@@ -17,12 +17,12 @@ export class DataStore {
   marketHoldingsUpdated = new EventEmitter<Array<Holding>>();
 
   historyLastUpdated = new Date();
-  history$: Observable<Array<IDatePrice>>;
-  historyUpdated = new EventEmitter<{ticker: string, history: Array<IDatePrice>}>();
+  history$: Observable<Array<{ticker: string, history: Array<IDatePrice>}>>;
+  historyUpdated = new EventEmitter<Array<{ticker: string, history: Array<IDatePrice>}>>();
 
   infoLastUpdated = new Date();
-  info$: Observable<IHoldingInfo>;
-  infoUpdated = new EventEmitter<{ticker: string, info: IHoldingInfo}>();
+  info$: Observable<Array<IHoldingInfo>>;
+  infoUpdated = new EventEmitter<Array<{ticker: string, info: IHoldingInfo}>>();
 
   constructor(private dataService: DataService) {
     DataStore.setLocal([], AppConfig.settings.infoCache);
@@ -110,36 +110,44 @@ export class DataStore {
 
   // *** History ***
 
-  refreshHistory(ticker: string, exchange: string) {
-    this.loadHistory(ticker, exchange);
+  getHistory(holdings: Array<Holding>, time: string, interval: string) {
+    this.loadHistory(holdings, time, interval);
     this.historyLastUpdated = new Date();
   }
 
-  loadHistory(ticker: string, exchange: string) {
-    let history: Array<IDatePrice> = [];
-    this.history$ = this.dataService.getHistory(ticker, exchange);
+  loadHistory(holdings: Array<Holding>, time: string, interval: string) {
+    let history: Array<{ticker: string, history: Array<IDatePrice>}> = [];
+    this.history$ = this.dataService.getHistory(holdings, time, interval);
     this.history$.subscribe(next => {
       if (next != null) {
         history = this.transformHistory(next);
       }
 
+      // update history cache
       const histroyObj = DataStore.getLocal(AppConfig.settings.historyCache);
-      const index = histroyObj.findIndex(myObj => myObj.ticker === ticker);
-      (index === -1) ? histroyObj.push({ticker: `${ticker}`, history: history}) :  histroyObj[index].history = history;
+      history.forEach(holding => {
+        const index = histroyObj.findIndex(myObj => myObj.ticker === holding.ticker);
+        (index === -1) ? histroyObj.push({ticker: `${holding.ticker}`, history: holding.history}) :  histroyObj[index].history = holding.history;
+      });
 
       DataStore.setLocal(histroyObj, AppConfig.settings.historyCache);
-      this.historyUpdated.emit({ticker: `${ticker}`, history: history});
+      this.historyUpdated.emit(history);
     });
   }
 
-  transformHistory(dataReceived: Array<any>): Array<IDatePrice> {
-    const history: Array<IDatePrice> = [];
+  transformHistory(dataReceived: Array<any>): Array<{ticker: string, history: Array<IDatePrice>}> {
+    const history: Array<{ticker: string, history: Array<IDatePrice>}> = [];
 
-    dataReceived.forEach(obj => {
-      history.push({
-        price: Number(Object.values(obj)[0]),
-        date: Object.keys(obj)[0]
+    dataReceived.forEach(data => {
+      const objHistory: {ticker: string, history: Array<IDatePrice>} = {ticker: '', history: []};
+      objHistory.ticker = data.ticker.split('.')[0];
+      data.history.forEach(obj => {
+        objHistory.history.push({
+          price: Number(Object.values(obj)[0]),
+          date: Object.keys(obj)[0]
+        });
       });
+      history.push(objHistory);
     });
 
     return history;
@@ -148,31 +156,37 @@ export class DataStore {
 
   // *** Info ***
 
-  refreshInfo(ticker: string, exchange: string) {
-    this.loadInfo(ticker, exchange);
+  getInfo(holdings: Array<Holding>) {
+    this.loadInfo(holdings);
     this.infoLastUpdated = new Date();
   }
 
-  loadInfo(ticker: string, exchange: string) {
-    let info: IHoldingInfo;
-    this.info$ = this.dataService.getInfo(ticker, exchange);
+  loadInfo(holdings) {
+    let info: Array<{ticker: string, info: IHoldingInfo}>;
+    this.info$ = this.dataService.getInfo(holdings);
     this.info$.subscribe(next => {
 
       if (next != null) {
         info = this.transformInfo(next);
       }
 
+      // update info cache
       const infoObj = DataStore.getLocal(AppConfig.settings.infoCache);
-      const index = infoObj.findIndex(myObj => myObj.ticker === ticker);
-      (index === -1) ? infoObj.push({ticker: `${ticker}`, info: info}) :  infoObj[index].info = info;
+      info.forEach(holding => {
+        const index = infoObj.findIndex(myObj => myObj.ticker === holding.ticker);
+        (index === -1) ? infoObj.push({ticker: `${holding.ticker}`, info: holding.info}) :  infoObj[index].info = holding.info;
+      });
 
       DataStore.setLocal(infoObj, AppConfig.settings.infoCache);
-      this.infoUpdated.emit({ticker: `${ticker}`, info: info});
+      this.infoUpdated.emit(info);
     });
   }
 
-  transformInfo(dataReceived: any): IHoldingInfo {
-    const info = dataReceived as IHoldingInfo;
+  transformInfo(dataReceived: Array<any>): Array<{ticker: string, info: IHoldingInfo}> {
+    const info: Array<{ticker: string, info: IHoldingInfo}> = [];
+    dataReceived.forEach(data => {
+      info.push({ticker: data.ticker.split('.')[0], info: data.info as IHoldingInfo});
+    });
     return info;
   }
 }

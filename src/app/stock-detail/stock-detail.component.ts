@@ -50,39 +50,13 @@ export class StockDetailComponent implements OnInit {
 
   // Check if we need to fetch new data or we can use cashed data
   ngOnInit() {
-
-    // History
-    this.historyObj = JSON.parse(localStorage[AppConfig.settings.historyCache]);
-    const historyIndex = this.historyObj.findIndex(myObj => myObj.ticker === this.holding.ticker);
-
-    if (historyIndex < 0) {
-      this.refreshHistory(this.holding.ticker, this.holding.exchange);
-    } else {
-      this.holding.history = this.historyObj[historyIndex].history;
-      this.updateChart();
-      this.setChangePct();
-    }
-
-    // Info
-    this.infoObj = JSON.parse(localStorage[AppConfig.settings.infoCache]);
-    const infoIndex = this.infoObj.findIndex(myObj => myObj.ticker === this.holding.ticker);
-
-    if (infoIndex < 0) {
-      this.refreshInfo(this.holding.ticker, this.holding.exchange);
-    } else {
-      this.holding.info = this.infoObj[infoIndex].info;
-    }
   }
 
 
   // *** Get Data Functions ***
 
   refreshHistory(ticker: string, exchange: string) {
-    this.dataStore.refreshHistory(ticker, exchange);
-  }
-
-  refreshInfo(ticker: string, exchange: string) {
-    this.dataStore.refreshInfo(ticker, exchange);
+    // this.dataStore.getHistory(ticker, exchange);
   }
 
 

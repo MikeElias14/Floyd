@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable} from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { Holding } from '../models/holding.model';
 
 @Injectable()
 export class DataService {
@@ -42,19 +43,21 @@ export class DataService {
     return res;
   }
 
-  getHistory(ticker: string, exchange: string) {
-    console.log(`GET: History: ${exchange}:${ticker}`);
+  getHistory(holdings: Array<Holding>, time: string, interval: string) {
+    console.log(`GET: History`);
 
-    let symbol: string;
+    const symbols: Array<string> = [];
 
-    if (exchange === 'TSE') {
-      symbol = `${ticker}.TO`;
-    } else {
-      symbol = ticker;
-    }
+    holdings.forEach(holding => {
+      if (holding.exchange === 'TSE') {
+        symbols.push(`${holding.ticker}.TO`);
+      } else {
+        symbols.push(holding.ticker);
+      }
+    });
 
     const res = this.httpClient.get<any>(
-      `${this.floydApiUrl}/holding/history?ticker=${symbol}`).pipe(
+      `${this.floydApiUrl}/holding/history?tickers=${symbols}&time=${time}&interval=${interval}`).pipe(
       map(obj => obj),
       catchError(this.handleError())
     );
@@ -62,19 +65,21 @@ export class DataService {
     return res;
   }
 
-  getInfo(ticker: string, exchange: string) {
-    console.log(`GET: Info: ${exchange}:${ticker}`);
+  getInfo(holdings: Array<Holding>) {
+    console.log(`GET: Info`);
 
-    let symbol: string;
+    const symbols: Array<string> = [];
 
-    if (exchange === 'TSE') {
-      symbol = `${ticker}.TO`;
-    } else {
-      symbol = ticker;
-    }
+    holdings.forEach(holding => {
+      if (holding.exchange === 'TSE') {
+        symbols.push(`${holding.ticker}.TO`);
+      } else {
+        symbols.push(holding.ticker);
+      }
+    });
 
     const res = this.httpClient.get<any>(
-      `${this.floydApiUrl}/holding/info?ticker=${symbol}`).pipe(
+      `${this.floydApiUrl}/holding/info?tickers=${symbols}`).pipe(
       map(obj => obj),
       catchError(this.handleError())
     );
