@@ -1,21 +1,26 @@
 .left {
     float: left;
+    width: 40%;
 }
 
 .right  {
     float: right;
-}
-
-.line-chart {
     width: 60%;
 }
 
-.table {
-    width: 40%;
-    margin-top: 8px;
+.center {
+    margin: auto;
+    width: 95%;
 }
 
-div table {
-    margin: auto;
-    width: 90%;
+.button-row button{
+    margin: 4px;
+}
+
+.negative {
+    color: red;
+}
+
+.positive {
+    color: green;
 }

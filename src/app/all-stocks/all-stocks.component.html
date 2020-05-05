@@ -71,20 +71,5 @@
       <mat-cell *matCellDef="let element"> {{element.sector}} </mat-cell>
     </ng-container>
 
-		<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row
-      *matRowDef="let row; columns: displayedColumns;"
-      matRipple class="element-row"
-      [cdkDetailRow]="row"
-      [cdkDetailRowTpl]="tpl">
-		</mat-row>
 	</table>
 </div>
-
-<ng-template #tpl let-element>
-	<div [@detailExpand] style="overflow: hidden">
-    <app-stock-detail 
-      [holding]="element"> 
-    </app-stock-detail>
-	</div>
-</ng-template>

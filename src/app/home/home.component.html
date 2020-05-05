@@ -6,8 +6,8 @@
 
 <div>
   <!-- MyHoldingsTable -->
-  <div class="left table">
-    <table mat-table [dataSource]="myHoldings" class="mat-elevation-z8"
+  <div class="left">
+    <table mat-table [dataSource]="myHoldings" class="center mat-elevation-z8"
         matSort matSortActive="created"
         matSortDisableClear
         matSortDirection="asc">
@@ -15,41 +15,59 @@
       <!-- ticker Column -->
       <ng-container matColumnDef="ticker">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Ticker</th>
-        <td mat-cell *matCellDef="let record"> {{record.ticker}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.ticker}} </td>
       </ng-container>
 
       <!-- owned Column -->
       <ng-container matColumnDef="owned">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Owned</th>
-        <td mat-cell *matCellDef="let record"> {{record.owned}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.owned}} </td>
       </ng-container>
 
       <!-- price Column -->
       <ng-container matColumnDef="price">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
-        <td mat-cell *matCellDef="let record"> {{record.price}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.price}} </td>
       </ng-container>
 
       <!-- totalPrice Column -->
       <ng-container matColumnDef="totalPrice">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Price</th>
-        <td mat-cell *matCellDef="let record"> {{record.price * record.owned | number}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.price * element.owned | number}} </td>
       </ng-container>
 
       <!-- exchange Column -->
       <ng-container matColumnDef="exchange">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Exchange</th>
-        <td mat-cell *matCellDef="let record"> {{record.exchange}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.exchange}} </td>
       </ng-container>
 
       <!-- sector Column -->
       <ng-container matColumnDef="sector">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Sector</th>
-        <td mat-cell *matCellDef="let record"> {{record.sector}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.sector}} </td>
       </ng-container>
 
+      <!-- changePrice Column -->
+    <ng-container matColumnDef="changePrice">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Change ($)</th>
+      <td mat-cell *matCellDef="let element"
+        [class.positive]= "element.changepct >= 0"
+        [class.negative]= "element.changepct < 0"
+      > ${{ element.price - (element.price / (1+element.changepct/100)) | number}} ({{element.changepct | number}}%)</td>
+    </ng-container>
+
+    <!-- changepct Column -->
+    <ng-container matColumnDef="changepct">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>Change (%)</mat-header-cell>
+      <mat-cell *matCellDef="let element"
+        [class.positive]= "element.changepct >= 0"
+        [class.negative]= "element.changepct < 0"
+      > {{element.changepct | number}}%</mat-cell>
+    </ng-container>
+
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setDetail(row)"></tr>
     </table>
 
     <mat-form-field>
@@ -64,14 +82,70 @@
     </mat-paginator>  
   </div>
 
+  <!-- Move this to own component to be used on other pages once working -->
+  <div class="right">
+    <div>
+      <div class="button-row">
+        <button mat-raised-button (click)="setTimeframe(5)">
+          1 Week 
+            <span [class.positive]= "changePct.oneWeek >= 0" [class.negative]= "changePct.oneWeek < 0">
+              ({{ changePct.oneWeek | number }}%)
+            </span>
+        </button>
+    
+        <button mat-raised-button (click)="setTimeframe(20)">
+          1 Month 
+            <span [class.positive]= "changePct.oneMonth >= 0" [class.negative]= "changePct.oneMonth < 0">
+              ({{ changePct.oneMonth | number }}%)
+            </span>
+        </button>
+    
+        <button mat-raised-button (click)="setTimeframe(125)">
+          6 Months 
+            <span [class.positive]= "changePct.sixMonths >= 0" [class.negative]= "changePct.sixMonths < 0">
+              ({{ changePct.sixMonths | number }}%)
+            </span>
+        </button>
+    
+        <button mat-raised-button (click)="setTimeframe(250)">
+          1 Year 
+            <span [class.positive]= "changePct.oneYear >= 0" [class.negative]= "changePct.oneYear < 0">
+              ({{ changePct.oneYear | number }}%)
+            </span>
+        </button>
+    
+        <button mat-raised-button (click)="setTimeframe(1250)">
+          5 Years 
+            <span [class.positive]= "changePct.fiveYears >= 0" [class.negative]= "changePct.fiveYears < 0">
+              ({{ changePct.fiveYears | number }}%)
+            </span>
+        </button>
+    
+        <button mat-raised-button (click)="setTimeframe(0)">
+          All Time 
+        </button>
+        
+      </div>
+    
+      <div class="center">
+        <app-line-chart
+          [datasets]="detailDataset"
+          [labels]="detailLabels"
+          [legend]="false">
+        </app-line-chart>
+      </div>
+    </div>
+    
+    <div class="table">
+      <table>
+        <tbody>
+          <tr><td>52 Week High</td><td>$ {{ detailHolding.info.fiftyTwoWeekHigh | number }}</td></tr>
+          <tr><td>52 Week Low</td><td>$ {{ detailHolding.info.fiftyTwoWeekLow | number }}</td></tr>
+          <tr><td>P/E</td><td>{{ detailHolding.info.trailingPE | number}}</td></tr>
+        </tbody>
+      </table>
+    
+    </div>
+  </div>
 
 </div>
-
-<!-- <div class="left chart">
-  <app-pie-chart
-    [labels]="pieTypeLabels"
-    [data]="pieTypeData"
-    [legend]="true">
-  </app-pie-chart>
-</div> -->
-

@@ -13,8 +13,6 @@ import { DataService } from './stores/data.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HomeComponent } from './home/home.component';
 import { AllStocksComponent } from './all-stocks/all-stocks.component';
-import {CdkDetailRowDirective} from './all-stocks/cdk-detail-row.directive';
-import { StockDetailComponent } from './stock-detail/stock-detail.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
 
 export function initializeApp(appConfig: AppConfig) {
@@ -27,8 +25,6 @@ export function initializeApp(appConfig: AppConfig) {
     PieChartComponent,
     HomeComponent,
     AllStocksComponent,
-    CdkDetailRowDirective,
-    StockDetailComponent,
     LineChartComponent
   ],
   imports: [
