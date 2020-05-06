@@ -3,7 +3,7 @@ import { AppConfig } from './../app.config';
 import { IDatePrice, IndexHolding } from './../models/holding.model';
 import { IIndexInfo } from './../models/info.model';
 import { DataStore } from './../stores/data.store';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-header',
@@ -44,7 +44,7 @@ export class HeaderComponent implements OnInit {
   }
   };
 
-  constructor(public dataStore: DataStore) {
+  constructor(public dataStore: DataStore, private cd: ChangeDetectorRef) {
     // Subscribe Info: When get new info, add info to index
     this.dataStore.indexInfoUpdated.subscribe(
       (newData: Array<{ticker: string, info: IIndexInfo}>) => {

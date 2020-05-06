@@ -15,14 +15,13 @@ import { MatSort } from '@angular/material/sort';
 })
 export class HomeComponent implements OnInit {
 
-  myHoldings = new MatTableDataSource<Holding>();
+  myHoldings: MatTableDataSource<Holding> = new MatTableDataSource<Holding>();
   displayedColumns: string[] = ['exchange', 'ticker', 'owned', 'price', 'totalPrice', 'changePrice', 'sector'];
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  mpPageSizeOptions: number[] = [10, 25, 100];
-  pageEvent: PageEvent;
-  // TODO: sorting broken
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  mpPageSizeOptions: number[] = [5, 10, 25, 100];
+  pageEvent: PageEvent;
 
   // Doughnut charts
   holdingPctData: Array<number> = [];
@@ -60,11 +59,7 @@ export class HomeComponent implements OnInit {
     // Subscribe myHoldings: This provides the basic data.
     this.dataStore.myHoldingsUpdated.subscribe(
       (newData: any) => {
-        this.myHoldings = new MatTableDataSource(newData);
-
-        this.myHoldings.paginator = this.paginator;
-        this.myHoldings.sort = this.sort;
-
+        this.myHoldings.data = newData;
         this.detailHolding = this.myHoldings.data[0];
       }
     );
@@ -86,6 +81,9 @@ export class HomeComponent implements OnInit {
         });
       }
     );
+
+    this.myHoldings.paginator = this.paginator;
+    this.myHoldings.sort = this.sort;
   }
 
   ngOnInit() {

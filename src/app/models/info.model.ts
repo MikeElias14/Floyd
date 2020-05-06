@@ -1,7 +1,7 @@
 // Holding Info from Floyd-api
 
 export interface IHoldingInfo {
-  beta: number;
+  beta: number ;
   bookValue: number;
   currency: string;
   dividendRate: number;
@@ -39,20 +39,7 @@ export interface IHoldingInfo {
 
 export interface IIndexInfo {
   currency: string;
-  dayHigh: number;
-  dayLow: number;
-  fiftyDayAverage: number;
-  fiftyTwoWeekHigh: number;
-  fiftyTwoWeekLow: number;
   open: number;
   previousClose: number;
-  regularMarketDayHigh: number;
-  regularMarketDayLow: number;
-  regularMarketOpen: number;
-  regularMarketPreviousClose: number;
-  regularMarketPrice: number;
-  regularMarketVolume: number;
   shortName: string;
-  twoHundredDayAverage: number;
-  volume: number;
 }

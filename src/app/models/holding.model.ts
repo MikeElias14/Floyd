@@ -53,7 +53,7 @@ export class IndexHolding implements IIndex {
   constructor(ticker: string) {
     this.ticker = ticker;
     this.changepct = 0;
-    this.info = null;
+    this.info = {} as IIndexInfo;
     this.dataset = [];
     this.history = [];
     this.labels = [];
