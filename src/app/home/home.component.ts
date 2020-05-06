@@ -3,7 +3,7 @@ import { IHoldingInfo } from '../models/info.model';
 import { AppConfig } from './../app.config';
 import { Holding, IDatePrice } from '../models/holding.model';
 import { DataStore } from '../stores/data.store';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit {
   };
 
 
-  constructor(public dataStore: DataStore) {
+  constructor(public dataStore: DataStore, private cd: ChangeDetectorRef) {
 
     // Subscribe myHoldings: This provides the basic data.
     this.dataStore.myHoldingsUpdated.subscribe(

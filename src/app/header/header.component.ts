@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import { ChartOptions } from 'chart.js';
 import { AppConfig } from './../app.config';
 import { IDatePrice, IndexHolding } from './../models/holding.model';
@@ -40,8 +41,8 @@ export class HeaderComponent implements OnInit {
       }],
       yAxes: [{
         display: false
-    }]
-  }
+      }]
+    }
   };
 
   constructor(public dataStore: DataStore, private cd: ChangeDetectorRef) {
@@ -95,6 +96,7 @@ export class HeaderComponent implements OnInit {
         this.updateChart(index);
       }
     });
+    this.cd.detectChanges();
   }
 
   updateChart(index: IndexHolding) {
