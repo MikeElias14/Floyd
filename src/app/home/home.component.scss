@@ -1,16 +1,37 @@
+.top {
+    height: 600px;
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
+
+.bottom {
+    height: 400px;
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
 .left {
     float: left;
-    width: 40%;
+    width: 50%;
 }
 
 .right  {
     float: right;
-    width: 60%;
+    width: 50%;
 }
 
 .center {
     margin: auto;
     width: 95%;
+}
+
+.detail-info-container table {
+    display: inline-block;
+    margin: 8px;
+}
+
+.chart-heading {
+    text-align: center;
+    margin: 8px;
 }
 
 .button-row button{

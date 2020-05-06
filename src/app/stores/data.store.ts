@@ -180,7 +180,11 @@ export class DataStore {
 
     dataReceived.forEach(data => {
       const objHistory: {ticker: string, history: Array<IDatePrice>} = {ticker: '', history: []};
-      objHistory.ticker = data.ticker.split('.')[0];
+      let ticker = data.ticker.substr(0, data.ticker.lastIndexOf('.'));
+      if (ticker === '') {
+        ticker = data.ticker;
+      }
+      objHistory.ticker = ticker;
       data.history.forEach(obj => {
         objHistory.history.push({
           price: Number(Object.values(obj)[0]),

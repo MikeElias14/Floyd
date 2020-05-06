@@ -24,7 +24,7 @@ export class Holding implements IHolding {
     this.marketcap = marketcap;
     this.owned = owned || 0;
     this.history = [];
-    this.info = null;
+    this.info = {} as IHoldingInfo;
   }
 }
 

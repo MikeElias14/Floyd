@@ -13,6 +13,7 @@ import { Component, OnInit } from '@angular/core';
 export class HeaderComponent implements OnInit {
 
   // TODO: Add futures to this (currently just index's (might work?))
+  // TODO: Dont make these the last days values in the mornig. if before 9:30 make 0 untill new data.
    indexs: Array<IndexHolding> = [
     new IndexHolding('^GSPTSE'),
     new IndexHolding('^GSPC'),

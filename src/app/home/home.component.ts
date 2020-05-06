@@ -1,4 +1,4 @@
-import { ChartDataSets } from 'chart.js';
+import { ChartDataSets, ChartOptions } from 'chart.js';
 import { IHoldingInfo } from '../models/info.model';
 import { AppConfig } from './../app.config';
 import { Holding, IDatePrice } from '../models/holding.model';
@@ -23,6 +23,21 @@ export class HomeComponent implements OnInit {
   pageEvent: PageEvent;
   // TODO: sorting broken
   @ViewChild(MatSort) sort: MatSort;
+
+  // Doughnut charts
+  holdingPctData: Array<number> = [];
+  holdingPctLabels: Array<string> = [];
+
+  sectorPctData: Array<number> = [];
+  sectorPctLabels: Array<string> = [];
+
+  pctChartOptions: ChartOptions = {
+    responsive: true,
+    legend: {
+      position: 'right',
+      align: 'start'
+    }
+  };
 
   // For detail view I will move to its own compoent once I get it working here
   detailHolding: Holding;
@@ -71,13 +86,6 @@ export class HomeComponent implements OnInit {
         });
       }
     );
-
-    this.myHoldings.sortingDataAccessor = (item, property) => {
-      switch (property) {
-        default: return item[property];
-      }
-    };
-
   }
 
   ngOnInit() {
@@ -97,7 +105,9 @@ export class HomeComponent implements OnInit {
     this.getInfo(this.myHoldings.data);
     this.getHistory(this.myHoldings.data, '5y', '1d');
 
+    // TODO: These dont update on their own...
     this.updateDetailChart();
+    this.updatePctCharts();
   }
 
 
@@ -128,7 +138,60 @@ export class HomeComponent implements OnInit {
   setDetail(row: Holding) {
     this.detailHolding = this.myHoldings.data.find(myObj => myObj.ticker === row.ticker);
     this.updateDetailChart();
+    this.updatePctCharts(); // Just for now.. TODO make this not have to be here
   }
+
+
+  // *** For Doughnut Charts ***
+
+  updatePctCharts() {
+    this.updateHoldingPcts();
+    this.updateSectorPcts();
+  }
+
+  updateHoldingPcts() {
+    const prices: Array<number> = [];
+    const pcts: Array<number> = [];
+    const tickers: Array<string> = [];
+    let totalValue = 0;
+
+    this.myHoldings.data.forEach(holding => {
+      tickers.push(holding.ticker);
+      prices.push(holding.price * holding.owned);
+      totalValue += holding.price * holding.owned;
+    });
+
+    prices.forEach(price => {
+      pcts.push(Number(((price / totalValue) * 100).toFixed(2)));
+    });
+
+    this.holdingPctData = pcts;
+    this.holdingPctLabels = tickers;
+  }
+
+  updateSectorPcts() {
+    const prices: Array<{sector: string, price: number}> = [];
+    const pcts: Array<number> = [];
+    const sectors: Array<string> = [];
+    let totalValue = 0;
+
+    this.myHoldings.data.forEach(holding => {
+      const listIndex = prices.findIndex(myObj => myObj.sector === holding.sector);
+      (listIndex === -1) ?
+        prices.push({sector: `${holding.sector}`, price: holding.price * holding.owned}) :
+          prices[listIndex].price += holding.price * holding.owned;
+      totalValue += holding.price * holding.owned;
+    });
+
+    prices.forEach(price => {
+      pcts.push(Number(((price.price / totalValue) * 100).toFixed(2)));
+      sectors.push(price.sector);
+    });
+
+    this.sectorPctData = pcts;
+    this.sectorPctLabels = sectors;
+  }
+
 
 
   // *** Detail view I will move to its own component later ***
