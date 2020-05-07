@@ -6,8 +6,12 @@
     color: green;
 }
 
+.flex {
+    display: flex;
+    flex-direction: column;
+}
+
 .top {
-    height: 675px;
     margin: 8px;
     margin-top: 16px;
 }
@@ -68,7 +72,9 @@ mat-paginator {
 }
 
 mat-card-header {
-    text-align: center;
+    font-size: larger;
+    font-weight: lighter;
+
 }
 
 mat-card-content {
