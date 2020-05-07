@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { ChartOptions } from 'chart.js';
 import { AppConfig } from './../app.config';
 import { IDatePrice, IndexHolding } from './../models/holding.model';
@@ -24,9 +23,15 @@ export class HeaderComponent implements OnInit {
     new IndexHolding('^VIX')
   ];
 
+  infoLoaded = false;
+  historyLoaded = false;
+
   chartOptions: ChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    tooltips: {
+      enabled: false
+    },
     elements: {
       point: {
         radius: 0
@@ -52,6 +57,9 @@ export class HeaderComponent implements OnInit {
         newData.forEach(data => {
           this.indexs.find(myObj => myObj.ticker === data.ticker).info = data.info;
         });
+        if (newData.length > 0) {
+          this.infoLoaded = true;
+        }
         this.setInfo();
       }
     );
@@ -62,6 +70,9 @@ export class HeaderComponent implements OnInit {
         newData.forEach(data => {
           this.indexs.find(myObj => myObj.ticker === data.ticker).history = data.history;
         });
+        if (newData.length > 0) {
+          this.historyLoaded = true;
+        }
         this.setInfo();
       }
     );
@@ -111,5 +122,13 @@ export class HeaderComponent implements OnInit {
       data: prices,
       label: index.ticker
     }];
+  }
+
+  get allLoaded() {
+    if (this.infoLoaded && this.historyLoaded) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
