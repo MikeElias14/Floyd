@@ -22,9 +22,6 @@ export class LineChartComponent {
   };
 
   @Input()
-  colors: Array<any>;
-
-  @Input()
   datasets: ChartDataSets;
 
   @Input()

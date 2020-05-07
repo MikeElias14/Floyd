@@ -3,7 +3,7 @@ import { IHoldingInfo } from '../models/info.model';
 import { AppConfig } from './../app.config';
 import { Holding, IDatePrice } from '../models/holding.model';
 import { DataStore } from '../stores/data.store';
-import { Component, OnInit, ViewChild, ChangeDetectorRef, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -13,7 +13,7 @@ import { MatSort } from '@angular/material/sort';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit {
 
   myHoldings: MatTableDataSource<Holding> = new MatTableDataSource<Holding>();
   displayedColumns: string[] = ['exchange', 'ticker', 'owned', 'price', 'totalPrice', 'change', 'sector'];
@@ -39,17 +39,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
   };
 
   // For detail view I will move to its own compoent once I get it working here
-  @ViewChild('detailChart') canvas: ElementRef;
   detailHolding: Holding;
-
-  redGradient: CanvasGradient;
-  greenGradient: CanvasGradient;
-  detailChartColors: any;
 
   detailDataset: Array<ChartDataSets> = [];
   detailLabels: Array<string> = [];
   currentChartTime = 'oneYear'; // Default one year
-  detailChartCtx = document.getElementById('detailChartID');
 
   chartTime = {
     oneWeek: {
@@ -142,10 +136,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     // TODO: These dont update on their own...
     // this.updateDetailChart();
     // this.updatePctCharts();
-  }
-
-  ngAfterViewInit() {
-    this.createGradients();
   }
 
 
@@ -251,17 +241,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   // *** Detail view I will move to its own component later ***
 
-  // TODO: Only call this once at contruction
-  createGradients() {
-    this.greenGradient = this.canvas.nativeElement.getContext('2d').createLinearGradient(0, 0, 0, 200);
-    this.greenGradient.addColorStop(0, 'rgba(0,255,0,1)');
-    this.greenGradient.addColorStop(1, 'rgba(0,255,0,0)');
-
-    this.redGradient = this.canvas.nativeElement.getContext('2d').createLinearGradient(0, 0, 0, 200);
-    this.redGradient.addColorStop(0, 'rgba(255,0,0,1)');
-    this.redGradient.addColorStop(1, 'rgba(255,0,0,0)');
-  }
-
   // *** Updating Chart Functions ***
   setDetailChangePct() {
     Object.keys(this.chartTime).forEach(time => {
@@ -283,13 +262,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   updateDetailChart() {
     this.setDetailChangePct();
     this.resetDetailChartData();
-
-    // update color
-    if (this.chartTime[this.currentChartTime].changePct >= 0) {
-      this.detailChartColors = [{ backgroundColor: this.greenGradient}];
-    } else {
-      this.detailChartColors = [{ backgroundColor: this.redGradient}];
-    }
 
     // update data
     let prices: Array<number> = [];
