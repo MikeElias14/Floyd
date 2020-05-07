@@ -14,6 +14,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HomeComponent } from './home/home.component';
 import { AllStocksComponent } from './all-stocks/all-stocks.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
+import { HeaderComponent } from './header/header.component';
+import { DoughnutChartComponent } from './doughnut-chart/doughnut-chart.component';
 
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();
@@ -25,7 +27,9 @@ export function initializeApp(appConfig: AppConfig) {
     PieChartComponent,
     HomeComponent,
     AllStocksComponent,
-    LineChartComponent
+    LineChartComponent,
+    HeaderComponent,
+    DoughnutChartComponent
   ],
   imports: [
     BrowserModule,

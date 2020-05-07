@@ -1,9 +1,9 @@
-import { ChartDataSets } from 'chart.js';
-import { IHoldingInfo } from './../models/holding-info.model';
+import { ChartDataSets, ChartOptions } from 'chart.js';
+import { IHoldingInfo } from '../models/info.model';
 import { AppConfig } from './../app.config';
 import { Holding, IDatePrice } from '../models/holding.model';
 import { DataStore } from '../stores/data.store';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -15,41 +15,81 @@ import { MatSort } from '@angular/material/sort';
 })
 export class HomeComponent implements OnInit {
 
-  myHoldings = new MatTableDataSource<Holding>();
-  displayedColumns: string[] = ['exchange', 'ticker', 'owned', 'price', 'totalPrice', 'changePrice', 'sector'];
-
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  mpPageSizeOptions: number[] = [10, 25, 100];
-  pageEvent: PageEvent;
+  myHoldings: MatTableDataSource<Holding> = new MatTableDataSource<Holding>();
+  displayedColumns: string[] = ['exchange', 'ticker', 'owned', 'price', 'totalPrice', 'change', 'sector'];
 
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  mpPageSizeOptions: number[] = [5, 10, 25, 100];
+  pageEvent: PageEvent;
+
+  // Doughnut charts
+  holdingPctData: Array<number> = [];
+  holdingPctLabels: Array<string> = [];
+
+  sectorPctData: Array<number> = [];
+  sectorPctLabels: Array<string> = [];
+
+  pctChartOptions: ChartOptions = {
+    responsive: true,
+    legend: {
+      position: 'right',
+      align: 'start'
+    }
+  };
 
   // For detail view I will move to its own compoent once I get it working here
   detailHolding: Holding;
 
   detailDataset: Array<ChartDataSets> = [];
   detailLabels: Array<string> = [];
-  chartDays = 250; // Default one year
+  currentChartTime = 'oneYear'; // Default one year
 
-  changePct = {
-    oneWeek: 0,
-    oneMonth: 0,
-    sixMonths: 0,
-    oneYear: 0,
-    fiveYears: 0
+  chartTime = {
+    oneWeek: {
+      days: 5,
+      changePct: 0
+    },
+    oneMonth: {
+      days: 22,
+      changePct: 0
+    },
+    sixMonths: {
+      days: 125,
+      changePct: 0
+    },
+    oneYear: {
+      days: 250,
+      changePct: 0
+    },
+    fiveYears: {
+      days: 1250,
+      changePct: 0
+    },
+    allTime: {
+      days: 0,
+      changePct: 0
+    }
   };
 
+  detailChartOptions: ChartOptions = {
+    responsive: true,
+    elements: {
+      point: {
+        radius: 1
+      },
+      line: {
+        tension: 0
+      }
+    }
+  };
 
-  constructor(public dataStore: DataStore) {
+  constructor(public dataStore: DataStore, private cd: ChangeDetectorRef) {
 
     // Subscribe myHoldings: This provides the basic data.
     this.dataStore.myHoldingsUpdated.subscribe(
       (newData: any) => {
-        this.myHoldings = new MatTableDataSource(newData);
-
-        this.myHoldings.paginator = this.paginator;
-        this.myHoldings.sort = this.sort;
-
+        this.myHoldings.data = newData;
         this.detailHolding = this.myHoldings.data[0];
       }
     );
@@ -72,12 +112,8 @@ export class HomeComponent implements OnInit {
       }
     );
 
-    this.myHoldings.sortingDataAccessor = (item, property) => {
-      switch (property) {
-        default: return item[property];
-      }
-    };
-
+    this.myHoldings.paginator = this.paginator;
+    this.myHoldings.sort = this.sort;
   }
 
   ngOnInit() {
@@ -97,7 +133,9 @@ export class HomeComponent implements OnInit {
     this.getInfo(this.myHoldings.data);
     this.getHistory(this.myHoldings.data, '5y', '1d');
 
-    this.updateDetailChart();
+    // TODO: These dont update on their own...
+    // this.updateDetailChart();
+    // this.updatePctCharts();
   }
 
 
@@ -128,44 +166,104 @@ export class HomeComponent implements OnInit {
   setDetail(row: Holding) {
     this.detailHolding = this.myHoldings.data.find(myObj => myObj.ticker === row.ticker);
     this.updateDetailChart();
+    this.updatePctCharts(); // Just for now.. TODO make this not have to be here
   }
+
+  get totalValue() {
+    let total = 0;
+    this.myHoldings.data.forEach(holding => {
+      total += holding.price * holding.owned;
+    });
+    return Number(total.toFixed(2));
+  }
+
+  get totalPctChange() {
+    let total = 0;
+    this.myHoldings.data.forEach(holding => {
+      total += holding.changepct;
+    });
+    total = total / this.myHoldings.data.length;
+    return Number(total.toFixed(2));
+  }
+
+
+  // *** For Doughnut Charts ***
+
+  updatePctCharts() {
+    this.updateHoldingPcts();
+    this.updateSectorPcts();
+  }
+
+  updateHoldingPcts() {
+    const prices: Array<number> = [];
+    const pcts: Array<number> = [];
+    const tickers: Array<string> = [];
+    let totalValue = 0;
+
+    this.myHoldings.data.forEach(holding => {
+      tickers.push(holding.ticker);
+      prices.push(holding.price * holding.owned);
+      totalValue += holding.price * holding.owned;
+    });
+
+    prices.forEach(price => {
+      pcts.push(Number(((price / totalValue) * 100).toFixed(2)));
+    });
+
+    this.holdingPctData = pcts;
+    this.holdingPctLabels = tickers;
+  }
+
+  updateSectorPcts() {
+    const prices: Array<{sector: string, price: number}> = [];
+    const pcts: Array<number> = [];
+    const sectors: Array<string> = [];
+    let totalValue = 0;
+
+    this.myHoldings.data.forEach(holding => {
+      const listIndex = prices.findIndex(myObj => myObj.sector === holding.sector);
+      (listIndex === -1) ?
+        prices.push({sector: `${holding.sector}`, price: holding.price * holding.owned}) :
+          prices[listIndex].price += holding.price * holding.owned;
+      totalValue += holding.price * holding.owned;
+    });
+
+    prices.forEach(price => {
+      pcts.push(Number(((price.price / totalValue) * 100).toFixed(2)));
+      sectors.push(price.sector);
+    });
+
+    this.sectorPctData = pcts;
+    this.sectorPctLabels = sectors;
+  }
+
 
 
   // *** Detail view I will move to its own component later ***
 
   // *** Updating Chart Functions ***
-  // TODO: Use for instead of all these ifs
   setDetailChangePct() {
-    this.changePct.oneWeek = this.calcChangePct(5);
-    this.changePct.oneMonth = this.calcChangePct(20);
-
-    if (this.detailHolding.history.length > 125) {
-      this.changePct.sixMonths = this.calcChangePct(125);
-    }
-
-    if (this.detailHolding.history.length > 250) {
-      this.changePct.oneYear = this.calcChangePct(250);
-    } else {
-      this.changePct.fiveYears = this.calcChangePct(0);
-    }
-
-    if (this.detailHolding.history.length > 1250) {
-      this.changePct.fiveYears = this.calcChangePct(1250);
-    } else {
-      this.changePct.fiveYears = this.calcChangePct(0);
-    }
+    Object.keys(this.chartTime).forEach(time => {
+      if (this.detailHolding.history.length > this.chartTime[time].days) {
+        this.chartTime[time].changePct = this.calcChangePct(this.chartTime[time].days);
+      } else {
+        this.chartTime[time].changePct = this.calcChangePct(0);
+      }
+    });
   }
 
   calcChangePct(day) {
     if (day === 0 ) { day = this.detailHolding.history.length; }
-    return Number(((
+    return Number((((
       this.detailHolding.price - this.detailHolding.history[this.detailHolding.history.length - day].price)
-       / this.detailHolding.price) * 100);
+       / this.detailHolding.price) * 100).toFixed(2));
   }
 
   updateDetailChart() {
     this.setDetailChangePct();
     this.resetDetailChartData();
+
+    // update data
     let prices: Array<number> = [];
 
     this.detailHolding.history.forEach(element => {
@@ -173,9 +271,9 @@ export class HomeComponent implements OnInit {
       this.detailLabels.push(String(element.date));
     });
 
-    if (this.chartDays !== 0 && this.chartDays < prices.length) {
-      prices = prices.slice(prices.length - this.chartDays);
-      this.detailLabels = this.detailLabels.slice(this.detailLabels.length - this.chartDays);
+    if ( this.currentChartTime !== 'alltime' && this.chartTime[this.currentChartTime].days < prices.length) {
+      prices = prices.slice(prices.length - this.chartTime[this.currentChartTime].days);
+      this.detailLabels = this.detailLabels.slice(this.detailLabels.length - this.chartTime[this.currentChartTime].days);
     }
 
     this.detailDataset.push({
@@ -189,8 +287,8 @@ export class HomeComponent implements OnInit {
     this.detailLabels = [];
   }
 
-  setTimeframe(days: number) {
-    this.chartDays = days;
+  setTimeframe(time: string) {
+    this.currentChartTime = time;
     this.updateDetailChart();
   }
 

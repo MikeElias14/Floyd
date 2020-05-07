@@ -43,13 +43,13 @@ export class DataService {
     return res;
   }
 
-  getHistory(holdings: Array<Holding>, time: string, interval: string) {
+  getHistory(holdings: Array<any>, time: string, interval: string) {
     console.log(`GET: History`);
 
     const symbols: Array<string> = [];
 
     holdings.forEach(holding => {
-      if (holding.exchange === 'TSE') {
+      if (holding.exchange && holding.exchange === 'TSE') {
         symbols.push(`${holding.ticker}.TO`);
       } else {
         symbols.push(holding.ticker);
@@ -65,13 +65,13 @@ export class DataService {
     return res;
   }
 
-  getInfo(holdings: Array<Holding>) {
+  getInfo(holdings: Array<any>, index: boolean = false) {
     console.log(`GET: Info`);
 
     const symbols: Array<string> = [];
 
     holdings.forEach(holding => {
-      if (holding.exchange === 'TSE') {
+      if (!index && holding.exchange === 'TSE') {
         symbols.push(`${holding.ticker}.TO`);
       } else {
         symbols.push(holding.ticker);
@@ -79,7 +79,7 @@ export class DataService {
     });
 
     const res = this.httpClient.get<any>(
-      `${this.floydApiUrl}/holding/info?tickers=${symbols}`).pipe(
+      `${this.floydApiUrl}/holding/info?tickers=${symbols}&index=${index}`).pipe(
       map(obj => obj),
       catchError(this.handleError())
     );

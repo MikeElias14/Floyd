@@ -1,151 +1,194 @@
-<!-- <h5>Total: {{ totalValues.total | number }}</h5>
-<h5>REIT Total:  {{ totalValues.reit }}</h5>
-<h5>gold Total:  {{ totalValues.gold }}</h5>
-<h5>other Total:  {{ totalValues.other }}</h5>
-<h5>market Total:  {{ totalValues.market }}</h5> -->
+<mat-card class="top flex">
+  <mat-card-header>
+    My Holdings: ${{ totalValue }} 
+    <span style="margin-left: 4px"
+      [class.positive]= "totalPctChange >= 0"
+      [class.negative]= "totalPctChange < 0">
+      ({{ totalPctChange }}%)
+    </span>
+  </mat-card-header>
+  <mat-card-content>
+    <!-- MyHoldingsTable -->
+    <div class="left mat-elevation-z4">
+      <div class="left ">
+        <mat-form-field>
+          <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+      </div>
+
+      <table mat-table [dataSource]="myHoldings" class="center"
+          matSort matSortActive="created"
+          matSortDisableClear
+          matSortDirection="asc">
+
+        <!-- ticker Column -->
+        <ng-container matColumnDef="ticker">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Ticker</th>
+          <td mat-cell *matCellDef="let element"> {{element.ticker}} </td>
+        </ng-container>
+
+        <!-- owned Column -->
+        <ng-container matColumnDef="owned">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Owned</th>
+          <td mat-cell *matCellDef="let element"> {{element.owned}} </td>
+        </ng-container>
+
+        <!-- price Column -->
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+          <td mat-cell *matCellDef="let element"> ${{element.price}} </td>
+        </ng-container>
+
+        <!-- totalPrice Column -->
+        <ng-container matColumnDef="totalPrice">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Price</th>
+          <td mat-cell *matCellDef="let element"> ${{element.price * element.owned | number}} </td>
+        </ng-container>
+
+        <!-- exchange Column -->
+        <ng-container matColumnDef="exchange">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Exchange</th>
+          <td mat-cell *matCellDef="let element"> {{element.exchange}} </td>
+        </ng-container>
+
+        <!-- sector Column -->
+        <ng-container matColumnDef="sector">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Sector</th>
+          <td mat-cell *matCellDef="let element"> {{element.sector}} </td>
+        </ng-container>
+
+        <!-- change Column -->
+        <ng-container matColumnDef="change">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Change ($)</th>
+          <td mat-cell *matCellDef="let element"
+            [class.positive]= "element.changepct >= 0"
+            [class.negative]= "element.changepct < 0"
+          > ${{ element.price - (element.price / (1+element.changepct/100)) | number}} ({{element.changepct | number}}%)</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setDetail(row)"></tr>
+      </table>
+
+      <div class="right">
+        <mat-paginator
+          [pageSizeOptions]="mpPageSizeOptions"
+          (page)="pageEvent = $event">
+        </mat-paginator>  
+      </div>
+    </div>
+
+    <!-- Move this to own component to be used on other pages once working -->
+    <!-- Detail -->
+    <div mat-card class="right">
+      <div>
+        <div class="button-row">
+          <button mat-raised-button (click)="setTimeframe('oneWeek')">
+            1 Week 
+              <span [class.positive]= "chartTime.oneWeek.changePct >= 0" [class.negative]= "chartTime.oneWeek.changePct < 0">
+              ({{ chartTime.oneWeek.changePct | number }}%)
+            </span>
+          </button>
+      
+          <button mat-raised-button (click)="setTimeframe('oneMonth')">
+            1 Month 
+            <span [class.positive]= "chartTime.oneMonth.changePct >= 0" [class.negative]= "chartTime.oneMonth.changePct < 0">
+              ({{ chartTime.oneMonth.changePct | number }}%)
+            </span>
+          </button>
+      
+          <button mat-raised-button (click)="setTimeframe('sixMonths')">
+            6 Months 
+            <span [class.positive]= "chartTime.sixMonths.changePct >= 0" [class.negative]= "chartTime.sixMonths.changePct < 0">
+              ({{ chartTime.sixMonths.changePct | number }}%)
+            </span>
+          </button>
+      
+          <button mat-raised-button (click)="setTimeframe('oneYear')">
+            1 Year 
+            <span [class.positive]= "chartTime.oneYear.changePct >= 0" [class.negative]= "chartTime.oneYear.changePct < 0">
+              ({{ chartTime.oneYear.changePct | number }}%)
+            </span>
+          </button>
+      
+          <button mat-raised-button (click)="setTimeframe('fiveYears')">
+            5 Years 
+            <span [class.positive]= "chartTime.fiveYears.changePct >= 0" [class.negative]= "chartTime.fiveYears.changePct < 0">
+              ({{ chartTime.fiveYears.changePct | number }}%)
+            </span>
+          </button>
+      
+          <button mat-raised-button (click)="setTimeframe('allTime')">
+            All Time 
+          </button>
+          
+        </div>
+      
+        <div class="center">
+          <app-line-chart
+            [datasets]="detailDataset"
+            [labels]="detailLabels"
+            [legend]="false">
+          </app-line-chart>
+        </div>
+      </div>
+      
+      <div class="detail-info-container">
+        <table class="mat-table">
+          <tbody>
+            <tr class="mat-row">
+              <td class="mat-cell info-cell">52 Week High:</td>
+              <td class="mat-cell info-cell">$ {{ detailHolding.info.fiftyTwoWeekHigh | number }}</td>
+            </tr>
+            <tr class="mat-row">
+              <td class="mat-cell info-cell">52 Week Low:</td>
+              <td class="mat-cell info-cell">$ {{ detailHolding.info.fiftyTwoWeekLow | number }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="mat-table">
+          <tbody>
+            <tr class="mat-row">
+              <td class="mat-cell info-cell">P/E:</td>
+              <td class="mat-cell info-cell">{{ detailHolding.info.trailingPE | number}}</td>
+            </tr>
+            <tr class="mat-row">
+              <td class="mat-cell info-cell">Dividend:</td>
+              <td class="mat-cell info-cell">{{ detailHolding.info.yield * 100| number }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
 
 <div>
-  <!-- MyHoldingsTable -->
-  <div class="left">
-    <table mat-table [dataSource]="myHoldings" class="center mat-elevation-z8"
-        matSort matSortActive="created"
-        matSortDisableClear
-        matSortDirection="asc">
+  <!-- Sector percentages -->
+  <mat-card class="sector-pct flex">
+    <mat-card-header>Sector Distribution</mat-card-header>
+    <app-doughnut-chart
+      [data]="sectorPctData"
+      [labels]="sectorPctLabels"
+      [options]="pctChartOptions"
+      [legend]="true">
+    </app-doughnut-chart>
+  </mat-card>
 
-      <!-- ticker Column -->
-      <ng-container matColumnDef="ticker">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Ticker</th>
-        <td mat-cell *matCellDef="let element"> {{element.ticker}} </td>
-      </ng-container>
+  <!-- Holding percentages -->
+  <mat-card class="holding-pct flex">
+    <mat-card-header>Holding Distribution</mat-card-header>
+    <app-doughnut-chart mat-card-content
+      [data]="holdingPctData"
+      [labels]="holdingPctLabels"
+      [options]="pctChartOptions"
+      [legend]="true">
+    </app-doughnut-chart>
+  </mat-card>
+</div>
 
-      <!-- owned Column -->
-      <ng-container matColumnDef="owned">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Owned</th>
-        <td mat-cell *matCellDef="let element"> {{element.owned}} </td>
-      </ng-container>
-
-      <!-- price Column -->
-      <ng-container matColumnDef="price">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
-        <td mat-cell *matCellDef="let element"> {{element.price}} </td>
-      </ng-container>
-
-      <!-- totalPrice Column -->
-      <ng-container matColumnDef="totalPrice">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Price</th>
-        <td mat-cell *matCellDef="let element"> {{element.price * element.owned | number}} </td>
-      </ng-container>
-
-      <!-- exchange Column -->
-      <ng-container matColumnDef="exchange">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Exchange</th>
-        <td mat-cell *matCellDef="let element"> {{element.exchange}} </td>
-      </ng-container>
-
-      <!-- sector Column -->
-      <ng-container matColumnDef="sector">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Sector</th>
-        <td mat-cell *matCellDef="let element"> {{element.sector}} </td>
-      </ng-container>
-
-      <!-- changePrice Column -->
-    <ng-container matColumnDef="changePrice">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Change ($)</th>
-      <td mat-cell *matCellDef="let element"
-        [class.positive]= "element.changepct >= 0"
-        [class.negative]= "element.changepct < 0"
-      > ${{ element.price - (element.price / (1+element.changepct/100)) | number}} ({{element.changepct | number}}%)</td>
-    </ng-container>
-
-    <!-- changepct Column -->
-    <ng-container matColumnDef="changepct">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>Change (%)</mat-header-cell>
-      <mat-cell *matCellDef="let element"
-        [class.positive]= "element.changepct >= 0"
-        [class.negative]= "element.changepct < 0"
-      > {{element.changepct | number}}%</mat-cell>
-    </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setDetail(row)"></tr>
-    </table>
-
-    <mat-form-field>
-      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-    </mat-form-field>
-    
-    <button class="mat-stroked-button" (click)="refreshMyHoldings()">Refresh Holdings</button>
-
-    <mat-paginator
-      [pageSizeOptions]="mpPageSizeOptions"
-      (page)="pageEvent = $event">
-    </mat-paginator>  
-  </div>
-
-  <!-- Move this to own component to be used on other pages once working -->
-  <div class="right">
-    <div>
-      <div class="button-row">
-        <button mat-raised-button (click)="setTimeframe(5)">
-          1 Week 
-            <span [class.positive]= "changePct.oneWeek >= 0" [class.negative]= "changePct.oneWeek < 0">
-              ({{ changePct.oneWeek | number }}%)
-            </span>
-        </button>
-    
-        <button mat-raised-button (click)="setTimeframe(20)">
-          1 Month 
-            <span [class.positive]= "changePct.oneMonth >= 0" [class.negative]= "changePct.oneMonth < 0">
-              ({{ changePct.oneMonth | number }}%)
-            </span>
-        </button>
-    
-        <button mat-raised-button (click)="setTimeframe(125)">
-          6 Months 
-            <span [class.positive]= "changePct.sixMonths >= 0" [class.negative]= "changePct.sixMonths < 0">
-              ({{ changePct.sixMonths | number }}%)
-            </span>
-        </button>
-    
-        <button mat-raised-button (click)="setTimeframe(250)">
-          1 Year 
-            <span [class.positive]= "changePct.oneYear >= 0" [class.negative]= "changePct.oneYear < 0">
-              ({{ changePct.oneYear | number }}%)
-            </span>
-        </button>
-    
-        <button mat-raised-button (click)="setTimeframe(1250)">
-          5 Years 
-            <span [class.positive]= "changePct.fiveYears >= 0" [class.negative]= "changePct.fiveYears < 0">
-              ({{ changePct.fiveYears | number }}%)
-            </span>
-        </button>
-    
-        <button mat-raised-button (click)="setTimeframe(0)">
-          All Time 
-        </button>
-        
-      </div>
-    
-      <div class="center">
-        <app-line-chart
-          [datasets]="detailDataset"
-          [labels]="detailLabels"
-          [legend]="false">
-        </app-line-chart>
-      </div>
-    </div>
-    
-    <div class="table">
-      <table>
-        <tbody>
-          <tr><td>52 Week High</td><td>$ {{ detailHolding.info.fiftyTwoWeekHigh | number }}</td></tr>
-          <tr><td>52 Week Low</td><td>$ {{ detailHolding.info.fiftyTwoWeekLow | number }}</td></tr>
-          <tr><td>P/E</td><td>{{ detailHolding.info.trailingPE | number}}</td></tr>
-        </tbody>
-      </table>
-    
-    </div>
-  </div>
+<!-- Upcoming Calendar -->
+<div>
 
 </div>

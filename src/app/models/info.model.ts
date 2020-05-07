@@ -1,7 +1,7 @@
 // Holding Info from Floyd-api
 
 export interface IHoldingInfo {
-  beta: number;
+  beta: number ;
   bookValue: number;
   currency: string;
   dividendRate: number;
@@ -35,4 +35,11 @@ export interface IHoldingInfo {
   website: string;
   yield: number;
   ytdReturn: number;
+}
+
+export interface IIndexInfo {
+  currency: string;
+  open: number;
+  previousClose: number;
+  shortName: string;
 }
