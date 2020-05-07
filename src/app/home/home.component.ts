@@ -1,3 +1,4 @@
+import { IHoldingEvent } from './../models/holding.model';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { IHoldingInfo } from '../models/info.model';
 import { AppConfig } from './../app.config';
@@ -112,6 +113,24 @@ export class HomeComponent implements OnInit {
       }
     );
 
+    // Subscribe Dividend History: When get new history, add history to holding in datatable
+    this.dataStore.dividendHistoryUpdated.subscribe(
+      (newData: Array<{ticker: string, history: Array<IDatePrice>}>) => {
+        newData.forEach(data => {
+          this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).diviendHistory = data.history;
+        });
+      }
+    );
+
+     // Subscribe Events: When get new history, add history to holding in datatable
+    this.dataStore.eventsUpdated.subscribe(
+      (newData: Array<{ticker: string, events: Array<IHoldingEvent>}>) => {
+        newData.forEach(data => {
+          this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).events = data.events;
+        });
+      }
+    );
+
     this.myHoldings.paginator = this.paginator;
     this.myHoldings.sort = this.sort;
   }
@@ -129,9 +148,19 @@ export class HomeComponent implements OnInit {
       JSON.parse(localStorage[AppConfig.settings.historyCache] || '[]')
     );
 
+    this.dataStore.dividendHistoryUpdated.emit(
+      JSON.parse(localStorage[AppConfig.settings.dividendHistoryCache] || '[]')
+    );
+
+    this.dataStore.eventsUpdated.emit(
+      JSON.parse(localStorage[AppConfig.settings.eventsCache] || '[]')
+    );
+
     // TODO: Bug when clearing cache and restarting
     this.getInfo(this.myHoldings.data);
     this.getHistory(this.myHoldings.data, '5y', '1d');
+    this.getDividendHistory(this.myHoldings.data);
+    this.getEvents(this.myHoldings.data);
 
     // TODO: These dont update on their own...
     // this.updateDetailChart();
@@ -152,6 +181,15 @@ export class HomeComponent implements OnInit {
   getHistory(holdings: Array<Holding>, time: string, interval: string) {
     this.dataStore.getHistory(holdings, time, interval);
   }
+
+  getDividendHistory(holdings: Array<Holding>) {
+    this.dataStore.getDividendHistory(holdings);
+  }
+
+  getEvents(holdings: Array<Holding>) {
+    this.dataStore.getEvents(holdings);
+  }
+
 
   // *** For Table ***
 
@@ -240,6 +278,7 @@ export class HomeComponent implements OnInit {
 
 
   // *** Detail view I will move to its own component later ***
+  // TODO: Add dividend history to this
 
   // *** Updating Chart Functions ***
   setDetailChangePct() {
@@ -291,6 +330,9 @@ export class HomeComponent implements OnInit {
     this.currentChartTime = time;
     this.updateDetailChart();
   }
+
+
+  // *** Calendar View ***
 
 
 }

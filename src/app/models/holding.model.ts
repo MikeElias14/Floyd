@@ -12,6 +12,8 @@ export class Holding implements IHolding {
   history: Array<IDatePrice>;
   info: IHoldingInfo;
   owned: number;
+  diviendHistory: Array<IDatePrice>;
+  events: Array<IHoldingEvent>;
 
   constructor(ticker: string, exchange: string, sector: string,
               price: number, changepct: number, marketcap: number, name?: string, owned?: number) {
@@ -25,6 +27,8 @@ export class Holding implements IHolding {
     this.owned = owned || 0;
     this.history = [];
     this.info = {} as IHoldingInfo;
+    this.diviendHistory = [];
+    this.events = [];
   }
 }
 
@@ -39,6 +43,20 @@ export interface IHolding {
   history: Array<IDatePrice>;
   info: IHoldingInfo;
   owned: number;
+  events: Array<IHoldingEvent>;
+  diviendHistory: Array<IDatePrice>;
+}
+
+export interface IHoldingEvent {
+  Value: {
+    'Earnings Average': number;
+    'Earnings Date': string;
+    'Earnings High': number;
+    'Earnings Low': number;
+    'Revenue Average': number;
+    'Revenue High': number;
+    'Revenue Low': number;
+  }
 }
 
 

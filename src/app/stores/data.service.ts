@@ -65,6 +65,28 @@ export class DataService {
     return res;
   }
 
+  getDividendHistory(holdings: Array<any>) {
+    console.log(`GET: Dividend History`);
+
+    const symbols: Array<string> = [];
+
+    holdings.forEach(holding => {
+      if (holding.exchange && holding.exchange === 'TSE') {
+        symbols.push(`${holding.ticker}.TO`);
+      } else {
+        symbols.push(holding.ticker);
+      }
+    });
+
+    const res = this.httpClient.get<any>(
+      `${this.floydApiUrl}/holding/div?tickers=${symbols}`).pipe(
+      map(obj => obj),
+      catchError(this.handleError())
+    );
+
+    return res;
+  }
+
   getInfo(holdings: Array<any>, index: boolean = false) {
     console.log(`GET: Info`);
 
@@ -80,6 +102,28 @@ export class DataService {
 
     const res = this.httpClient.get<any>(
       `${this.floydApiUrl}/holding/info?tickers=${symbols}&index=${index}`).pipe(
+      map(obj => obj),
+      catchError(this.handleError())
+    );
+
+    return res;
+  }
+  
+  getEvents(holdings: Array<any>) {
+    console.log(`GET: Events`);
+
+    const symbols: Array<string> = [];
+
+    holdings.forEach(holding => {
+      if (holding.exchange && holding.exchange === 'TSE') {
+        symbols.push(`${holding.ticker}.TO`);
+      } else {
+        symbols.push(holding.ticker);
+      }
+    });
+
+    const res = this.httpClient.get<any>(
+      `${this.floydApiUrl}/holding/events?tickers=${symbols}`).pipe(
       map(obj => obj),
       catchError(this.handleError())
     );
