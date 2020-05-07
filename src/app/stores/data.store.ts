@@ -333,7 +333,7 @@ export class DataStore {
         eventsObj.push({ticker: `${holding.ticker}`, events: holding.events}) :  eventsObj[index].events = holding.events;
       });
 
-      DataStore.setLocal(eventsObj, AppConfig.settings.dividendHistoryCache);
+      DataStore.setLocal(eventsObj, AppConfig.settings.eventsCache);
       this.eventsUpdated.emit(events);
     });
   }

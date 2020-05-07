@@ -56,7 +56,7 @@ export interface IHoldingEvent {
     'Revenue Average': number;
     'Revenue High': number;
     'Revenue Low': number;
-  }
+  };
 }
 
 

@@ -159,6 +159,15 @@
             </tr>
           </tbody>
         </table>
+        
+        <div class="chart-container">
+          <app-line-chart
+            [datasets]="detailDivDataset"
+            [labels]="detailDivLabels"
+            [legend]="false">
+        </app-line-chart>
+      </div>
+
       </div>
     </div>
   </mat-card-content>

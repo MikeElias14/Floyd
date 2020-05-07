@@ -16,6 +16,7 @@ import { AllStocksComponent } from './all-stocks/all-stocks.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
 import { HeaderComponent } from './header/header.component';
 import { DoughnutChartComponent } from './doughnut-chart/doughnut-chart.component';
+import { BarChartComponent } from './bar-chart/bar-chart.component';
 
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();
@@ -29,7 +30,8 @@ export function initializeApp(appConfig: AppConfig) {
     AllStocksComponent,
     LineChartComponent,
     HeaderComponent,
-    DoughnutChartComponent
+    DoughnutChartComponent,
+    BarChartComponent
   ],
   imports: [
     BrowserModule,

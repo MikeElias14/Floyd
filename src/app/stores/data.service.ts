@@ -108,7 +108,7 @@ export class DataService {
 
     return res;
   }
-  
+
   getEvents(holdings: Array<any>) {
     console.log(`GET: Events`);
 

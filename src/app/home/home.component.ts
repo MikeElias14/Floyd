@@ -85,6 +85,7 @@ export class HomeComponent implements OnInit {
     }
   };
 
+  // TODO: Find better solution for the __.un things
   constructor(public dataStore: DataStore, private cd: ChangeDetectorRef) {
 
     // Subscribe myHoldings: This provides the basic data.
@@ -99,7 +100,8 @@ export class HomeComponent implements OnInit {
     this.dataStore.infoUpdated.subscribe(
       (newData: Array<{ticker: string, info: IHoldingInfo}>) => {
         newData.forEach(data => {
-          this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).info = data.info;
+          try { this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).info = data.info; }
+          catch { this.myHoldings.data.find(myObj => myObj.ticker.split('.')[0] === data.ticker).info = data.info; }
         });
       }
     );
@@ -108,7 +110,8 @@ export class HomeComponent implements OnInit {
     this.dataStore.historyUpdated.subscribe(
       (newData: Array<{ticker: string, history: Array<IDatePrice>}>) => {
         newData.forEach(data => {
-          this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).history = data.history;
+          try { this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).history = data.history; }
+          catch { this.myHoldings.data.find(myObj => myObj.ticker.split('.')[0] === data.ticker).history = data.history; }
         });
       }
     );
@@ -117,7 +120,8 @@ export class HomeComponent implements OnInit {
     this.dataStore.dividendHistoryUpdated.subscribe(
       (newData: Array<{ticker: string, history: Array<IDatePrice>}>) => {
         newData.forEach(data => {
-          this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).diviendHistory = data.history;
+          try { this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).diviendHistory = data.history; }
+          catch { this.myHoldings.data.find(myObj => myObj.ticker.split('.')[0] === data.ticker).diviendHistory = data.history; }
         });
       }
     );
@@ -126,7 +130,8 @@ export class HomeComponent implements OnInit {
     this.dataStore.eventsUpdated.subscribe(
       (newData: Array<{ticker: string, events: Array<IHoldingEvent>}>) => {
         newData.forEach(data => {
-          this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).events = data.events;
+          try { this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).events = data.events; }
+          catch { this.myHoldings.data.find(myObj => myObj.ticker.split('.')[0] === data.ticker).events = data.events; }
         });
       }
     );
@@ -329,6 +334,14 @@ export class HomeComponent implements OnInit {
   setTimeframe(time: string) {
     this.currentChartTime = time;
     this.updateDetailChart();
+  }
+
+  get detailDivDataset() {
+    return 
+  }
+
+  get detailDivLabels() {
+    return 
   }
 
 
