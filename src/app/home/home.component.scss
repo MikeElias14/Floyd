@@ -1,22 +1,44 @@
-.top {
-    height: 600px;
-    margin-bottom: 8px;
-    margin-top: 8px;
+.negative {
+    color: red;
 }
 
-.bottom {
-    height: 400px;
-    margin-bottom: 8px;
-    margin-top: 8px;
+.positive {
+    color: green;
 }
+
+.top {
+    height: 675px;
+    margin: 8px;
+    margin-top: 16px;
+}
+
 .left {
     float: left;
-    width: 50%;
+    width: 49%;
 }
 
 .right  {
     float: right;
-    width: 50%;
+    width: 49%;
+}
+
+.sector-pct {
+    float: left;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    margin-right: 4px;
+    margin-left: 8px;
+    width: 48%;
+}
+
+.holding-pct {
+    float: right;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    margin-left: 4px;
+    margin-right: 8px;
+    width: 48%;
+
 }
 
 .center {
@@ -29,19 +51,26 @@
     margin: 8px;
 }
 
-.chart-heading {
-    text-align: center;
-    margin: 8px;
+.info-cell {
+    padding: 4px;
 }
 
 .button-row button{
     margin: 4px;
 }
 
-.negative {
-    color: red;
+mat-form-field {
+    margin: 8px;
 }
 
-.positive {
-    color: green;
+mat-paginator {
+    background: none;
+}
+
+mat-card-header {
+    text-align: center;
+}
+
+mat-card-content {
+    margin: 8px;
 }

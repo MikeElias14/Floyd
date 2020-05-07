@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCardModule } from '@angular/material/card';
 
 import { NgModule } from '@angular/core';
 import {CdkTableModule} from '@angular/cdk/table';
@@ -26,7 +27,8 @@ import {CdkTreeModule} from '@angular/cdk/tree';
     CdkTableModule,
     CdkTreeModule,
     MatIconModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatCardModule
   ],
   exports: [
     MatButtonModule,
@@ -40,7 +42,8 @@ import {CdkTreeModule} from '@angular/cdk/tree';
     CdkTableModule,
     CdkTreeModule,
     MatIconModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatCardModule
   ]
 })
 export class MaterialModule { }
