@@ -57,11 +57,11 @@
       <tbody>
         <tr class="mat-row">
           <td class="mat-cell info-cell">52 Week High:</td>
-          <td class="mat-cell info-cell">$ {{ _holding.info.fiftyTwoWeekHigh | number }}</td>
+          <td class="mat-cell info-cell">$ {{ holding.info.fiftyTwoWeekHigh | number }}</td>
         </tr>
         <tr class="mat-row">
           <td class="mat-cell info-cell">52 Week Low:</td>
-          <td class="mat-cell info-cell">$ {{ _holding.info.fiftyTwoWeekLow | number }}</td>
+          <td class="mat-cell info-cell">$ {{ holding.info.fiftyTwoWeekLow | number }}</td>
         </tr>
       </tbody>
     </table>
@@ -70,11 +70,11 @@
       <tbody>
         <tr class="mat-row">
           <td class="mat-cell info-cell">P/E:</td>
-          <td class="mat-cell info-cell">{{ _holding.info.trailingPE | number}}</td>
+          <td class="mat-cell info-cell">{{ holding.info.trailingPE | number}}</td>
         </tr>
         <tr class="mat-row">
           <td class="mat-cell info-cell">Dividend:</td>
-          <td class="mat-cell info-cell">{{ _holding.info.yield * 100| number }}%</td>
+          <td class="mat-cell info-cell">{{ holding.info.yield * 100| number }}%</td>
         </tr>
       </tbody>
     </table>

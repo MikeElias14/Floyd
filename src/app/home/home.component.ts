@@ -25,11 +25,21 @@ export class HomeComponent implements OnInit {
   pageEvent: PageEvent;
 
   // Doughnut charts
-  holdingPctData: Array<number> = [];
-  holdingPctLabels: Array<string> = [];
+  private _holdingPctData: Array<number> = [];
+  get holdingPctData() { return this._holdingPctData; }
+  set holdingPctData(data: Array<number>) { this._holdingPctData = data; }
 
-  sectorPctData: Array<number> = [];
-  sectorPctLabels: Array<string> = [];
+  private _holdingPctLabels: Array<string> = [];
+  get holdingPctLabels() { return this._holdingPctLabels; }
+  set holdingPctLabels(data: Array<string>) { this._holdingPctLabels = data; }
+
+  private _sectorPctData: Array<number> = [];
+  get sectorPctData() { return this._sectorPctData; }
+  set sectorPctData(data: Array<number>) { this._sectorPctData = data; }
+
+  private _sectorPctLabels: Array<string> = [];
+  get sectorPctLabels() { return this._sectorPctLabels; }
+  set sectorPctLabels(data: Array<string>) { this._sectorPctLabels = data; }
 
   pctChartOptions: ChartOptions = {
     responsive: true,
@@ -39,7 +49,9 @@ export class HomeComponent implements OnInit {
     }
   };
 
-  detailHolding: Holding;
+  private _detailHolding: Holding;
+  get detailHolding() { return this._detailHolding; }
+  set detailHolding(data: Holding) { this._detailHolding = data; }
 
   constructor(public dataStore: DataStore, private cd: ChangeDetectorRef) {
 
@@ -122,13 +134,11 @@ export class HomeComponent implements OnInit {
     this.getDividendHistory(this.myHoldings.data);
     this.getEvents(this.myHoldings.data);
 
-    // TODO: These dont update on their own...
-    // this.updateDetailChart();
-    // this.updatePctCharts();
+    this.updatePctCharts();  // TODO: charts dont appear right away
   }
 
 
-  // *** For Datastore ***
+  /* For Datastore */
 
   getMyHoldings() {
     this.dataStore.getMyHoldings();
@@ -151,7 +161,7 @@ export class HomeComponent implements OnInit {
   }
 
 
-  // *** For Table ***
+  /* For Table */
 
   applyFilter(filterValue: string) {
     this.myHoldings.filter = filterValue.trim().toLowerCase();
@@ -164,7 +174,6 @@ export class HomeComponent implements OnInit {
   setDetailHolding(row: Holding) {
     const holding: Holding = this.myHoldings.data.find(myObj => myObj.ticker === row.ticker);
     this.setDetail = holding;
-    this.updatePctCharts(); // Just for now.. TODO make this not have to be here
   }
 
   get totalValue() {
@@ -185,7 +194,7 @@ export class HomeComponent implements OnInit {
   }
 
 
-  // *** For Doughnut Charts ***
+  /* For Doughnut (Pct) Charts */
 
   updatePctCharts() {
     this.updateHoldingPcts();
@@ -208,8 +217,8 @@ export class HomeComponent implements OnInit {
       pcts.push(Number(((price / totalValue) * 100).toFixed(2)));
     });
 
-    this.holdingPctData = pcts;
-    this.holdingPctLabels = tickers;
+    this._holdingPctData = pcts;
+    this._holdingPctLabels = tickers;
   }
 
   updateSectorPcts() {
@@ -231,11 +240,11 @@ export class HomeComponent implements OnInit {
       sectors.push(price.sector);
     });
 
-    this.sectorPctData = pcts;
-    this.sectorPctLabels = sectors;
+    this._sectorPctData = pcts;
+    this._sectorPctLabels = sectors;
   }
 
-  // *** Detail  ***
+  /* Detail  */
   get getDetail() {
     return this.detailHolding;
   }
@@ -244,7 +253,7 @@ export class HomeComponent implements OnInit {
     this.detailHolding = holding;
   }
 
-  // *** Calendar View ***
+  /* Calendar View */
 
 
 }

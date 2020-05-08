@@ -8,14 +8,16 @@ import { Component, OnInit, Input } from '@angular/core';
   styleUrls: ['./holding-detail.component.scss']
 })
 export class HoldingDetailComponent {
+  private _holding: Holding;
 
   @Input()
   set holding(holding: Holding) {
     this._holding = holding;
     this.updateChart();
   }
+  get holding() { return this._holding; }
 
-  _holding: Holding;
+
 
   dataset: Array<ChartDataSets> = [];
   labels: Array<string> = [];
