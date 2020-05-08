@@ -1,0 +1,9 @@
+<div *ngIf="datasets">
+  <canvas baseChart
+    chartType="bar"
+    [labels]="labels"
+    [datasets] = "datasets"
+    [options]="options"
+    [legend]="legend">
+  </canvas>
+</div>

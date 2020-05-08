@@ -1,14 +1,18 @@
 .info-container {
   font-size: small;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .index-info {
   margin: 8px;
   padding: 8px;
-  height: 30%;
+  display: flex;
+  flex-direction: column;
   display: inline-block;
   background-color: white;
   color: black;
+  font-weight: lighter;
 }
 
 .negative {

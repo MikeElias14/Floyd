@@ -1,3 +1,4 @@
+import { IHoldingEvent } from './../models/holding.model';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { IHoldingInfo } from '../models/info.model';
 import { AppConfig } from './../app.config';
@@ -84,6 +85,7 @@ export class HomeComponent implements OnInit {
     }
   };
 
+  // TODO: Find better solution for the __.un things
   constructor(public dataStore: DataStore, private cd: ChangeDetectorRef) {
 
     // Subscribe myHoldings: This provides the basic data.
@@ -98,7 +100,8 @@ export class HomeComponent implements OnInit {
     this.dataStore.infoUpdated.subscribe(
       (newData: Array<{ticker: string, info: IHoldingInfo}>) => {
         newData.forEach(data => {
-          this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).info = data.info;
+          try { this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).info = data.info; }
+          catch { this.myHoldings.data.find(myObj => myObj.ticker.split('.')[0] === data.ticker).info = data.info; }
         });
       }
     );
@@ -107,7 +110,28 @@ export class HomeComponent implements OnInit {
     this.dataStore.historyUpdated.subscribe(
       (newData: Array<{ticker: string, history: Array<IDatePrice>}>) => {
         newData.forEach(data => {
-          this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).history = data.history;
+          try { this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).history = data.history; }
+          catch { this.myHoldings.data.find(myObj => myObj.ticker.split('.')[0] === data.ticker).history = data.history; }
+        });
+      }
+    );
+
+    // Subscribe Dividend History: When get new history, add history to holding in datatable
+    this.dataStore.dividendHistoryUpdated.subscribe(
+      (newData: Array<{ticker: string, history: Array<IDatePrice>}>) => {
+        newData.forEach(data => {
+          try { this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).diviendHistory = data.history; }
+          catch { this.myHoldings.data.find(myObj => myObj.ticker.split('.')[0] === data.ticker).diviendHistory = data.history; }
+        });
+      }
+    );
+
+     // Subscribe Events: When get new history, add history to holding in datatable
+    this.dataStore.eventsUpdated.subscribe(
+      (newData: Array<{ticker: string, events: Array<IHoldingEvent>}>) => {
+        newData.forEach(data => {
+          try { this.myHoldings.data.find(myObj => myObj.ticker === data.ticker).events = data.events; }
+          catch { this.myHoldings.data.find(myObj => myObj.ticker.split('.')[0] === data.ticker).events = data.events; }
         });
       }
     );
@@ -129,9 +153,19 @@ export class HomeComponent implements OnInit {
       JSON.parse(localStorage[AppConfig.settings.historyCache] || '[]')
     );
 
+    this.dataStore.dividendHistoryUpdated.emit(
+      JSON.parse(localStorage[AppConfig.settings.dividendHistoryCache] || '[]')
+    );
+
+    this.dataStore.eventsUpdated.emit(
+      JSON.parse(localStorage[AppConfig.settings.eventsCache] || '[]')
+    );
+
     // TODO: Bug when clearing cache and restarting
     this.getInfo(this.myHoldings.data);
     this.getHistory(this.myHoldings.data, '5y', '1d');
+    this.getDividendHistory(this.myHoldings.data);
+    this.getEvents(this.myHoldings.data);
 
     // TODO: These dont update on their own...
     // this.updateDetailChart();
@@ -141,8 +175,8 @@ export class HomeComponent implements OnInit {
 
   // *** For Datastore ***
 
-  refreshMyHoldings() {
-    this.dataStore.loadMyHoldings();
+  getMyHoldings() {
+    this.dataStore.getMyHoldings();
   }
 
   getInfo(holdings: Array<Holding>) {
@@ -152,6 +186,15 @@ export class HomeComponent implements OnInit {
   getHistory(holdings: Array<Holding>, time: string, interval: string) {
     this.dataStore.getHistory(holdings, time, interval);
   }
+
+  getDividendHistory(holdings: Array<Holding>) {
+    this.dataStore.getDividendHistory(holdings);
+  }
+
+  getEvents(holdings: Array<Holding>) {
+    this.dataStore.getEvents(holdings);
+  }
+
 
   // *** For Table ***
 
@@ -240,6 +283,7 @@ export class HomeComponent implements OnInit {
 
 
   // *** Detail view I will move to its own component later ***
+  // TODO: Add dividend history to this
 
   // *** Updating Chart Functions ***
   setDetailChangePct() {
@@ -255,8 +299,8 @@ export class HomeComponent implements OnInit {
   calcChangePct(day) {
     if (day === 0 ) { day = this.detailHolding.history.length; }
     return Number((((
-      this.detailHolding.price - this.detailHolding.history[this.detailHolding.history.length - day].price)
-       / this.detailHolding.price) * 100).toFixed(2));
+      this.detailHolding.history[this.detailHolding.history.length - day].price - this.detailHolding.price)
+       / this.detailHolding.history[this.detailHolding.history.length - day].price) * -100).toFixed(2));
   }
 
   updateDetailChart() {
@@ -291,6 +335,17 @@ export class HomeComponent implements OnInit {
     this.currentChartTime = time;
     this.updateDetailChart();
   }
+
+  get detailDivDataset() {
+    return 
+  }
+
+  get detailDivLabels() {
+    return 
+  }
+
+
+  // *** Calendar View ***
 
 
 }

@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { ChartOptions } from 'chart.js';
 import { AppConfig } from './../app.config';
 import { IDatePrice, IndexHolding } from './../models/holding.model';
@@ -24,27 +23,6 @@ export class HeaderComponent implements OnInit {
     new IndexHolding('^VIX')
   ];
 
-  chartOptions: ChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    elements: {
-      point: {
-        radius: 0
-      },
-      line: {
-        tension: 0
-      }
-    },
-    scales: {
-      xAxes: [{
-          display: false
-      }],
-      yAxes: [{
-        display: false
-      }]
-    }
-  };
-
   constructor(public dataStore: DataStore, private cd: ChangeDetectorRef) {
     // Subscribe Info: When get new info, add info to index
     this.dataStore.indexInfoUpdated.subscribe(
@@ -52,7 +30,7 @@ export class HeaderComponent implements OnInit {
         newData.forEach(data => {
           this.indexs.find(myObj => myObj.ticker === data.ticker).info = data.info;
         });
-        this.setInfo();
+        this.updateView();
       }
     );
 
@@ -62,7 +40,7 @@ export class HeaderComponent implements OnInit {
         newData.forEach(data => {
           this.indexs.find(myObj => myObj.ticker === data.ticker).history = data.history;
         });
-        this.setInfo();
+        this.updateView();
       }
     );
   }
@@ -72,44 +50,28 @@ export class HeaderComponent implements OnInit {
       JSON.parse(localStorage[AppConfig.settings.indexInfoCache] || '[]')
     );
 
-    this.dataStore.historyUpdated.emit(
-      JSON.parse(localStorage[AppConfig.settings.historyCache] || '[]')
+    this.dataStore.indexHistoryUpdated.emit(
+      JSON.parse(localStorage[AppConfig.settings.indexHistoryCache] || '[]')
     );
 
-    // TODO: Bug when clearing cache and restarting
     this.getIndexInfo(this.indexs);
     this.getHistory(this.indexs, '1d', '15m');
   }
 
   getIndexInfo(indexs: Array<IndexHolding>) {
-    this.dataStore.getIndex(indexs);
+    this.dataStore.getIndexInfo(indexs);
   }
 
   getHistory(indexs: Array<IndexHolding>, time: string, interval: string) {
-    this.dataStore.getIndexHistory(indexs, time, interval);
+    this.dataStore.getHistory(indexs, time, interval, true);
   }
 
-  setInfo() {
+  updateView() {
     this.indexs.forEach(index => {
       if (index.info && index.history.length > 0) {
         index.changepct = ((index.history[0].price / index.info.previousClose) - 1) * 100;
-        this.updateChart(index);
       }
     });
     this.cd.detectChanges();
-  }
-
-  updateChart(index: IndexHolding) {
-    const prices: Array<number> = [];
-
-    index.history.forEach(element => {
-      prices.push(Number(element.price));
-      index.labels.push(String(element.date));
-    });
-
-    index.dataset = [{
-      data: prices,
-      label: index.ticker
-    }];
   }
 }
