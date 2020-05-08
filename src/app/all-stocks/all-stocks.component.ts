@@ -47,7 +47,7 @@ export class AllStocksComponent implements OnInit, AfterViewInit {
   }
 
   refreshMarketHoldings() {
-    this.dataStore.refreshMarketData();
+    this.dataStore.getMarketHoldings();
   }
 
   applyFilter(filterValue: string) {

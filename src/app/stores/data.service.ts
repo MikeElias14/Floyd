@@ -14,13 +14,6 @@ export class DataService {
 
   constructor(private httpClient: HttpClient) {}
 
-  private handleError() {
-    return (error: any): Observable<any> => {
-      console.error(error);
-      return;
-    };
-  }
-
   getMyHoldings(): Observable<any> {
     console.log(`GET: MyHoldings`);
 
@@ -46,15 +39,7 @@ export class DataService {
   getHistory(holdings: Array<any>, time: string, interval: string) {
     console.log(`GET: History`);
 
-    const symbols: Array<string> = [];
-
-    holdings.forEach(holding => {
-      if (holding.exchange && holding.exchange === 'TSE') {
-        symbols.push(`${holding.ticker}.TO`);
-      } else {
-        symbols.push(holding.ticker);
-      }
-    });
+    const symbols: Array<string> = this.getSymbols(holdings);
 
     const res = this.httpClient.get<any>(
       `${this.floydApiUrl}/holding/history?tickers=${symbols}&time=${time}&interval=${interval}`).pipe(
@@ -68,15 +53,7 @@ export class DataService {
   getDividendHistory(holdings: Array<any>) {
     console.log(`GET: Dividend History`);
 
-    const symbols: Array<string> = [];
-
-    holdings.forEach(holding => {
-      if (holding.exchange && holding.exchange === 'TSE') {
-        symbols.push(`${holding.ticker}.TO`);
-      } else {
-        symbols.push(holding.ticker);
-      }
-    });
+    const symbols: Array<string> = this.getSymbols(holdings);
 
     const res = this.httpClient.get<any>(
       `${this.floydApiUrl}/holding/div?tickers=${symbols}`).pipe(
@@ -88,17 +65,9 @@ export class DataService {
   }
 
   getInfo(holdings: Array<any>, index: boolean = false) {
-    console.log(`GET: Info`);
+    console.log(`GET: Info - Index: ${index}`);
 
-    const symbols: Array<string> = [];
-
-    holdings.forEach(holding => {
-      if (!index && holding.exchange === 'TSE') {
-        symbols.push(`${holding.ticker}.TO`);
-      } else {
-        symbols.push(holding.ticker);
-      }
-    });
+    const symbols: Array<string> = this.getSymbols(holdings);
 
     const res = this.httpClient.get<any>(
       `${this.floydApiUrl}/holding/info?tickers=${symbols}&index=${index}`).pipe(
@@ -112,15 +81,7 @@ export class DataService {
   getEvents(holdings: Array<any>) {
     console.log(`GET: Events`);
 
-    const symbols: Array<string> = [];
-
-    holdings.forEach(holding => {
-      if (holding.exchange && holding.exchange === 'TSE') {
-        symbols.push(`${holding.ticker}.TO`);
-      } else {
-        symbols.push(holding.ticker);
-      }
-    });
+    const symbols: Array<string> = this.getSymbols(holdings);
 
     const res = this.httpClient.get<any>(
       `${this.floydApiUrl}/holding/events?tickers=${symbols}`).pipe(
@@ -130,4 +91,27 @@ export class DataService {
 
     return res;
   }
+
+  /* Helpers */
+
+  private handleError() {
+    return (error: any): Observable<any> => {
+      console.error(error);
+      return;
+    };
+  }
+
+  private getSymbols(holdings: Array<any>): Array<string> {
+    const symbols: Array<string> = [];
+    holdings.forEach(holding => {
+      if (holding.exchange && holding.exchange === 'TSE') {  // This covers index's as they don't have exchange field
+        symbols.push(`${holding.ticker}.TO`);
+      } else {
+        symbols.push(holding.ticker);
+      }
+    });
+
+    return symbols;
+  }
+
 }
