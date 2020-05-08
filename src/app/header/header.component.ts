@@ -50,8 +50,8 @@ export class HeaderComponent implements OnInit {
       JSON.parse(localStorage[AppConfig.settings.indexInfoCache] || '[]')
     );
 
-    this.dataStore.historyUpdated.emit(
-      JSON.parse(localStorage[AppConfig.settings.historyCache] || '[]')
+    this.dataStore.indexHistoryUpdated.emit(
+      JSON.parse(localStorage[AppConfig.settings.indexHistoryCache] || '[]')
     );
 
     this.getIndexInfo(this.indexs);
