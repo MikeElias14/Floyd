@@ -184,12 +184,12 @@ export class HomeComponent implements OnInit {
     return Number(total.toFixed(2));
   }
 
-  get totalPctChange() {
+  get totalPctChange() {  // Weighted overall pct change
     let total = 0;
     this.myHoldings.data.forEach(holding => {
-      total += holding.changepct;
+      total += holding.changepct * holding.price * holding.owned;
     });
-    total = total / this.myHoldings.data.length;
+    total = total / this.totalValue;
     return Number(total.toFixed(2));
   }
 
