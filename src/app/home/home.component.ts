@@ -175,8 +175,8 @@ export class HomeComponent implements OnInit {
 
   // *** For Datastore ***
 
-  refreshMyHoldings() {
-    this.dataStore.loadMyHoldings();
+  getMyHoldings() {
+    this.dataStore.getMyHoldings();
   }
 
   getInfo(holdings: Array<Holding>) {
@@ -299,8 +299,8 @@ export class HomeComponent implements OnInit {
   calcChangePct(day) {
     if (day === 0 ) { day = this.detailHolding.history.length; }
     return Number((((
-      this.detailHolding.price - this.detailHolding.history[this.detailHolding.history.length - day].price)
-       / this.detailHolding.price) * 100).toFixed(2));
+      this.detailHolding.history[this.detailHolding.history.length - day].price - this.detailHolding.price)
+       / this.detailHolding.history[this.detailHolding.history.length - day].price) * -100).toFixed(2));
   }
 
   updateDetailChart() {

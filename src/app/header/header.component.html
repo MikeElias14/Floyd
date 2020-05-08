@@ -1,22 +1,10 @@
 <div class="info-container">
   <mat-card *ngFor="let index of indexs" class="index-info">
-      <!-- <mat-card-header> -->
         {{index.info.shortName}}
         <span style="margin-left: 4px;"
           [class.positive]= "index.changepct >= 0"
           [class.negative]= "index.changepct < 0">
-        ({{index.changepct | number}}%)</span>
-      <!-- </mat-card-header> -->
-
-      <!-- <mat-card-content *ngIf="allLoaded" class="chart-container">
-          <app-line-chart
-            [datasets]="index.dataset"
-            [labels]="index.labels"
-            [options]="chartOptions"
-            [legend]="false">
-        </app-line-chart>
-      </mat-card-content> -->
-        
+        ({{index.changepct | number}}%)</span>        
   </mat-card>
 </div>
 
