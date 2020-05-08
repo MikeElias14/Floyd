@@ -97,7 +97,7 @@ export class HeaderComponent implements OnInit {
   }
 
   getHistory(indexs: Array<IndexHolding>, time: string, interval: string) {
-    this.dataStore.getIndexHistory(indexs, time, interval);
+    this.dataStore.getHistory(indexs, time, interval, true);
   }
 
   setInfo() {
