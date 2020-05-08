@@ -39,53 +39,8 @@ export class HomeComponent implements OnInit {
     }
   };
 
-  // For detail view I will move to its own compoent once I get it working here
   detailHolding: Holding;
 
-  detailDataset: Array<ChartDataSets> = [];
-  detailLabels: Array<string> = [];
-  currentChartTime = 'oneYear'; // Default one year
-
-  chartTime = {
-    oneWeek: {
-      days: 5,
-      changePct: 0
-    },
-    oneMonth: {
-      days: 22,
-      changePct: 0
-    },
-    sixMonths: {
-      days: 125,
-      changePct: 0
-    },
-    oneYear: {
-      days: 250,
-      changePct: 0
-    },
-    fiveYears: {
-      days: 1250,
-      changePct: 0
-    },
-    allTime: {
-      days: 0,
-      changePct: 0
-    }
-  };
-
-  detailChartOptions: ChartOptions = {
-    responsive: true,
-    elements: {
-      point: {
-        radius: 1
-      },
-      line: {
-        tension: 0
-      }
-    }
-  };
-
-  // TODO: Find better solution for the __.un things
   constructor(public dataStore: DataStore, private cd: ChangeDetectorRef) {
 
     // Subscribe myHoldings: This provides the basic data.
@@ -206,9 +161,9 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  setDetail(row: Holding) {
-    this.detailHolding = this.myHoldings.data.find(myObj => myObj.ticker === row.ticker);
-    this.updateDetailChart();
+  setDetailHolding(row: Holding) {
+    const holding: Holding = this.myHoldings.data.find(myObj => myObj.ticker === row.ticker);
+    this.setDetail = holding;
     this.updatePctCharts(); // Just for now.. TODO make this not have to be here
   }
 
@@ -280,70 +235,14 @@ export class HomeComponent implements OnInit {
     this.sectorPctLabels = sectors;
   }
 
-
-
-  // *** Detail view I will move to its own component later ***
-  // TODO: Add dividend history to this
-
-  // *** Updating Chart Functions ***
-  setDetailChangePct() {
-    Object.keys(this.chartTime).forEach(time => {
-      if (this.detailHolding.history.length > this.chartTime[time].days) {
-        this.chartTime[time].changePct = this.calcChangePct(this.chartTime[time].days);
-      } else {
-        this.chartTime[time].changePct = this.calcChangePct(0);
-      }
-    });
+  // *** Detail  ***
+  get getDetail() {
+    return this.detailHolding;
   }
 
-  calcChangePct(day) {
-    if (day === 0 ) { day = this.detailHolding.history.length; }
-    return Number((((
-      this.detailHolding.history[this.detailHolding.history.length - day].price - this.detailHolding.price)
-       / this.detailHolding.history[this.detailHolding.history.length - day].price) * -100).toFixed(2));
+  set setDetail(holding: Holding) {
+    this.detailHolding = holding;
   }
-
-  updateDetailChart() {
-    this.setDetailChangePct();
-    this.resetDetailChartData();
-
-    // update data
-    let prices: Array<number> = [];
-
-    this.detailHolding.history.forEach(element => {
-      prices.push(Number(element.price));
-      this.detailLabels.push(String(element.date));
-    });
-
-    if ( this.currentChartTime !== 'alltime' && this.chartTime[this.currentChartTime].days < prices.length) {
-      prices = prices.slice(prices.length - this.chartTime[this.currentChartTime].days);
-      this.detailLabels = this.detailLabels.slice(this.detailLabels.length - this.chartTime[this.currentChartTime].days);
-    }
-
-    this.detailDataset.push({
-      data: prices,
-      label: this.detailHolding.ticker
-    });
-  }
-
-  resetDetailChartData() {
-    this.detailDataset = [];
-    this.detailLabels = [];
-  }
-
-  setTimeframe(time: string) {
-    this.currentChartTime = time;
-    this.updateDetailChart();
-  }
-
-  get detailDivDataset() {
-    return 
-  }
-
-  get detailDivLabels() {
-    return 
-  }
-
 
   // *** Calendar View ***
 
