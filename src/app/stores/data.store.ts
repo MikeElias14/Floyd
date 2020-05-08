@@ -155,7 +155,7 @@ export class DataStore {
 
   /* Index Info*/
 
-  getIndex(indexs: Array<IndexHolding>) {
+  getIndexInfo(indexs: Array<IndexHolding>) {
     let indexInfo: Array<{ticker: string, info: IIndexInfo}>;
     this.indexInfo$ = this.dataService.getInfo(indexs, true);
     this.indexInfo$.subscribe(next => {
@@ -258,10 +258,12 @@ export class DataStore {
     dataReceived.forEach(data => {
       const objEvent: {ticker: string, events: Array<IHoldingEvent>} = {ticker: this.transformTicker(data.ticker), events: []};
 
-      data.events.forEach(obj => {
-        objEvent.events.push(obj as IHoldingEvent);
-      });
-      events.push(objEvent);
+      if (data.events.length > 0) {
+        data.events.forEach(obj => {
+          objEvent.events.push(obj as IHoldingEvent);
+        });
+        events.push(objEvent);
+      }
     });
 
     return events;
@@ -269,7 +271,7 @@ export class DataStore {
 
   transformTicker(ticker: string): string {
     let res = ticker.substr(0, ticker.lastIndexOf('.'));  // To get rid of '.TO'
-    if (ticker === '') {
+    if (res === '') {
       res = ticker;
     }
     return res;
