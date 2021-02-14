@@ -1,0 +1,90 @@
+<!--  -->
+<div>
+  <div>
+    <div class="button-row">
+      <button mat-raised-button (click)="setTimeframe('oneWeek')">
+        1 Week 
+          <span [class.positive]= "chartTime.oneWeek.changePct >= 0" [class.negative]= "chartTime.oneWeek.changePct < 0">
+          ({{ chartTime.oneWeek.changePct | number }}%)
+        </span>
+      </button>
+  
+      <button mat-raised-button (click)="setTimeframe('oneMonth')">
+        1 Month 
+        <span [class.positive]= "chartTime.oneMonth.changePct >= 0" [class.negative]= "chartTime.oneMonth.changePct < 0">
+          ({{ chartTime.oneMonth.changePct | number }}%)
+        </span>
+      </button>
+  
+      <button mat-raised-button (click)="setTimeframe('sixMonths')">
+        6 Months 
+        <span [class.positive]= "chartTime.sixMonths.changePct >= 0" [class.negative]= "chartTime.sixMonths.changePct < 0">
+          ({{ chartTime.sixMonths.changePct | number }}%)
+        </span>
+      </button>
+  
+      <button mat-raised-button (click)="setTimeframe('oneYear')">
+        1 Year 
+        <span [class.positive]= "chartTime.oneYear.changePct >= 0" [class.negative]= "chartTime.oneYear.changePct < 0">
+          ({{ chartTime.oneYear.changePct | number }}%)
+        </span>
+      </button>
+  
+      <button mat-raised-button (click)="setTimeframe('fiveYears')">
+        5 Years 
+        <span [class.positive]= "chartTime.fiveYears.changePct >= 0" [class.negative]= "chartTime.fiveYears.changePct < 0">
+          ({{ chartTime.fiveYears.changePct | number }}%)
+        </span>
+      </button>
+  
+      <button mat-raised-button (click)="setTimeframe('allTime')">
+        All Time 
+      </button>
+      
+    </div>
+  
+    <div class="center">
+      <app-line-chart
+        [datasets]="dataset"
+        [labels]="labels"
+        [legend]="false">
+      </app-line-chart>
+    </div>
+  </div>
+  
+  <div class="info-container">
+    <table class="mat-table">
+      <tbody>
+        <tr class="mat-row">
+          <td class="mat-cell info-cell">52 Week High:</td>
+          <td class="mat-cell info-cell">$ {{ holding.info.fiftyTwoWeekHigh | number }}</td>
+        </tr>
+        <tr class="mat-row">
+          <td class="mat-cell info-cell">52 Week Low:</td>
+          <td class="mat-cell info-cell">$ {{ holding.info.fiftyTwoWeekLow | number }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="mat-table">
+      <tbody>
+        <tr class="mat-row">
+          <td class="mat-cell info-cell">P/E:</td>
+          <td class="mat-cell info-cell">{{ holding.info.trailingPE | number}}</td>
+        </tr>
+        <tr class="mat-row">
+          <td class="mat-cell info-cell">Dividend:</td>
+          <td class="mat-cell info-cell">{{ holding.info.yield * 100| number }}%</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- <div class="chart-container">
+      <app-line-chart
+        [datasets]="DivDataset"
+        [labels]="DivLabels"
+        [legend]="false">
+      </app-line-chart>
+    </div> -->
+  </div>
+</div>

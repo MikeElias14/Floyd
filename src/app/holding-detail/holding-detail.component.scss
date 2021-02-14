@@ -1,0 +1,32 @@
+.negative {
+  color: red;
+}
+
+.positive {
+  color: green;
+}
+
+.center {
+  margin: auto;
+  width: 95%;
+}
+
+.button-row button{
+  margin: 4px;
+}
+
+.info-container table {
+  display: inline-block;
+  margin: 8px;
+}
+
+.info-cell {
+  padding: 4px;
+}
+
+.chart-container {
+  position: relative;
+  margin: auto;
+  height: 2vh;
+  width: 6vw;
+}
